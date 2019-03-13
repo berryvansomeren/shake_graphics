@@ -6,6 +6,7 @@
 
 #include "shake/core/contracts/contracts.hpp"
 #include "shake/core/types/underlying_cast.hpp"
+#include "shake/graphics/gl_debug_message.hpp"
 
 namespace shake {
 namespace graphics {
@@ -58,10 +59,14 @@ uint32_t polygon_mode_to_gl( const PolygonMode polygon_mode )
 
 void init( const GLLoadProc& gl_load_proc )
 {
-    if ( !gladLoadGLLoader( ( GLADloadproc ) gl_load_proc ) ) 
+    const auto load_success = gladLoadGLLoader( ( GLADloadproc ) gl_load_proc );
+    if ( !load_success ) 
     {
         CHECK_FAIL( "Could not initialize OpenGl Context" );
     }
+    glGetString(GL_VERSION); // todo remove
+
+    glDebugMessageCallback( (GLDEBUGPROC) debug_message::callback, 0 );
 
     // Enable depth (Z) buffer (accept "closest" fragment)
     enable_depth_test();

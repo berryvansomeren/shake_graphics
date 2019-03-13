@@ -100,11 +100,11 @@ void callback
     const void*     userParam
 )
 {
-    //if ( type == GL_DEBUG_TYPE_ERROR )
+    if ( type == GL_DEBUG_TYPE_ERROR )
     {
         const std::string message_str { to_string( source, type, id, severity, length, message, userParam ) };
         LOG( message_str );
-        //CHECK_FAIL( "An OpenGL error occurred." );
+        CHECK_FAIL( "An OpenGL error occurred." );
     }
 }
 
