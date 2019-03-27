@@ -1,7 +1,5 @@
 #include "draw_text.hpp"
 
-//#include "shake/content/content_manager.hpp"
-
 #include "shake/core/math/transform_2d.hpp"
 
 #include "shake/graphics/draw.hpp"
@@ -12,14 +10,11 @@ namespace graphics  {
 //----------------------------------------------------------------
 void draw
 (
-    const std::string&  text,
-    const glm::vec2&    position,
-    const std::string&  font_path
+    const std::string&              text,
+    const glm::vec2&                position,
+    const std::shared_ptr<Font>&    font
 )
 {
-    /*auto& content_manager   = content::ContentManager::get_instance();
-    const auto font         = content_manager.get_or_load<Font>     ( io::Path { font_path   } );
-
     glm::vec2 character_origin { position };
 
     for ( const char& c : text )
@@ -33,7 +28,7 @@ void draw
         draw( character.render_pack, transform );
 
         character_origin += character.advance;
-    }*/
+    }
 }
 
 } // namespace graphics

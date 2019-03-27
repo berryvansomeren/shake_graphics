@@ -19,6 +19,8 @@ Camera::Camera(size_t screen_width, size_t screen_height)
     , m_transform       { }
 {
     update_projection_matrix();
+
+    m_transform.translate( { 5.f, 50.f, -50.f } );
 }
 
 //----------------------------------------------------------------

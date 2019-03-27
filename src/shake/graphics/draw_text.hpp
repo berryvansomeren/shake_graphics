@@ -4,15 +4,16 @@
 #include <string>
 
 #include "shake/core/math/math.hpp"
+#include "shake/graphics/assets/font.hpp"
 
 namespace shake     {
 namespace graphics  {
 
 void draw
 (
-    const std::string&      text,
-    const glm::vec2&        position,
-    const std::string&      font_path   = "fonts/open_sans/open_sans.json"
+    const std::string&              text,
+    const glm::vec2&                position,
+    const std::shared_ptr<Font>&    font
 );
 
 } // namespace graphics
