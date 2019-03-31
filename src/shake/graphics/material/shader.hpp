@@ -39,7 +39,7 @@ public:
     // create a basic shader program with just a vertex and a fragment shader
     static std::unique_ptr<Shader> create_basic(const std::string &vertex_shader_source, const std::string &fragment_shader_source);
 
-    bool has_uniform_location( const std::string& uniform_name ) const;
+    bool has_uniform( const std::string& uniform_name ) const;
     int32_t get_uniform_location( const std::string& uniform_name ) const;
 
     template<typename T>
@@ -47,6 +47,9 @@ public:
 
     template<typename T>
     inline void set_uniform(const std::string& uniform_name, const T& value);
+
+    template<typename T>
+    inline void try_set_uniform(const std::string& uniform_name, const T& value);
 
 private:
     // helper for creating different types of shaders

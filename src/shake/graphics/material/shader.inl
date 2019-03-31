@@ -70,7 +70,7 @@ inline uint32_t Shader::get_program_id() const
 }
 
 //----------------------------------------------------------------
-inline bool Shader::has_uniform_location( const std::string& uniform_name ) const
+inline bool Shader::has_uniform( const std::string& uniform_name ) const
 {
     GLint uniform_location { glGetUniformLocation(m_id, uniform_name.c_str()) };
     return uniform_location >= 0;
@@ -97,6 +97,16 @@ inline void Shader::set_uniform(const int32_t uniform_location, const T& value)
 {
     CHECK_EQ(m_id, gl::get_current_shader_id(), "Trying to set uniform while shader is not currently bound.");
     set_uniform_impl(uniform_location, value);
+}
+
+template<typename T>
+inline void Shader::try_set_uniform( const std::string& uniform_name, const T& value )
+{
+    CHECK_EQ(m_id, gl::get_current_shader_id(), "Trying to set uniform while shader is not currently bound.");
+    if ( has_uniform( uniform_name ) )
+    {
+        set_uniform( uniform_name, value );
+    }
 }
 
 } // namespace graphics

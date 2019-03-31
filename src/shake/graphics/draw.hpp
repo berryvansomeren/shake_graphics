@@ -28,9 +28,9 @@ void draw
 
     material->bind();
 
-    shader->set_uniform( "u_model",         transform.get_matrix()          );
+    shader->set_uniform( "u_SHAKE_MODEL",         transform.get_matrix()          );
     // still have to support 2D camera
-    shader->set_uniform( "u_projection",    get_current_ortho_projection()  );
+    shader->set_uniform( "u_SHAKE_PROJECTION",    get_current_ortho_projection()  );
 
     shader->set_uniform( "u_color", glm::vec3( 1.f ) );
 
@@ -54,9 +54,9 @@ void draw
 
     material->bind();
 
-    shader->set_uniform( "u_model",         transform.get_matrix()          );
-    shader->set_uniform( "u_view",          camera->get_view_matrix()       );
-    shader->set_uniform( "u_projection",    camera->get_projection_matrix() );
+    shader->try_set_uniform( "u_SHAKE_MODEL",       transform.get_matrix()          );
+    shader->set_uniform( "u_SHAKE_VIEW",        camera->get_view_matrix()       );
+    shader->set_uniform( "u_SHAKE_PROJECTION",  camera->get_projection_matrix() );
 
     // shader->set_uniform( "u_color", glm::vec3( 1.f ) );
 
