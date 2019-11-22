@@ -5,9 +5,9 @@ namespace graphics  {
 
 namespace { // anonymous
 
-glm::vec2               g_current_screen_size       { };
-std::weak_ptr<Camera>   g_current_camera            { };
-glm::mat4               g_current_ortho_projection  { };
+glm::vec2                   g_current_screen_size       { };
+std::shared_ptr<Camera>     g_current_camera            { };
+glm::mat4                   g_current_ortho_projection  { };
 
 } // namespace anonymous
 
@@ -31,11 +31,11 @@ void set_current_camera( const Camera::Ptr& camera )
 }
 
 //----------------------------------------------------------------
-Camera::Ptr get_current_camera( )
+Camera::Ptr& get_current_camera( )
 {
-    if (auto camera_shared_ptr = g_current_camera.lock())
+    if ( g_current_camera )
     {
-        return camera_shared_ptr;
+        return g_current_camera;
     }
     else
     {

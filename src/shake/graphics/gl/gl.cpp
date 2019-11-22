@@ -41,6 +41,8 @@ GLenum PrimitiveTypeToGlMode( const PrimitiveType primitive_type )
     case PrimitiveType::TriangleFan:    return GL_TRIANGLE_FAN;     break;
     default: CHECK_FAIL( "Unsupported PrimitiveType" ); break;
     }
+
+    return std::uno
 }
 
 uint32_t framebuffer_bit_flag_to_gl( const FramebufferBitFlag framebuffer_bit_flag )
@@ -232,23 +234,23 @@ TextureId gen_texture()
 {
     auto id = GLuint { };
     glGenTextures( 1, &id );
-    return TextureId { static_cast<TextureId::value_type>( id ) };
+    return TextureId { id };
 
 }
 
 void delete_texture( const TextureId id )
 {
-    //glDeleteTextures( 1, *id );
+    glDeleteTextures( 1, *id );
 }
 
 void bind_texture( const TextureTarget target, const TextureId id )
 {
-    //glBindTexture( *target, *id );
+    glBindTexture( *target, *id );
 }
 
 void active_texture( const TextureUnit unit )
 {
-    //glActiveTexture( *unit );
+    glActiveTexture( *unit );
 }
 
 } // namespace gl

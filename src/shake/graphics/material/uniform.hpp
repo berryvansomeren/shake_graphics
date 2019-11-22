@@ -3,6 +3,9 @@
 
 #include <memory>
 
+#include "shake/core/math/math.hpp"
+#include "shake/core/types/underlying_cast.hpp"
+
 #include "shake/graphics/material/cube_map.hpp"
 #include "shake/graphics/material/shader.hpp"
 #include "shake/graphics/material/texture.hpp"

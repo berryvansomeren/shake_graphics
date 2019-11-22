@@ -3,10 +3,14 @@
 #include <cassert>
 #include <vector>
 
+
+
 #include "shake/core/log.hpp"
+#include "shake/core/math/math.hpp"
 //#include "shake/io/file.hpp"
 
 #include "shader_preprocessor.hpp"
+
 
 namespace shake {
 namespace graphics {
@@ -36,6 +40,51 @@ void log_gl_program_error(GLuint program)
 }
 
 } // namespace anonymous
+
+
+
+
+//----------------------------------------------------------------
+void Shader::bind() const
+{
+    CHECK_NE(m_id, gl::get_current_shader_id(), "Trying to bind a shader while it is already bound.");
+    gl::set_current_shader_id(m_id);
+    glUseProgram(m_id);
+}
+
+//----------------------------------------------------------------
+void Shader::unbind() const
+{
+    CHECK_EQ(m_id, gl::get_current_shader_id(), "Trying to unbind a shader while it is not currently bound.");
+    gl::set_current_shader_id(0);
+    glUseProgram(0);
+}
+
+//----------------------------------------------------------------
+uint32_t Shader::get_program_id() const
+{
+    return m_id;
+}
+
+//----------------------------------------------------------------
+bool Shader::has_uniform( const std::string& uniform_name ) const
+{
+    GLint uniform_location { glGetUniformLocation(m_id, uniform_name.c_str()) };
+    return uniform_location >= 0;
+}
+
+//----------------------------------------------------------------
+int32_t Shader::get_uniform_location(const std::string& uniform_name) const
+{
+    GLint uniform_location { glGetUniformLocation(m_id, uniform_name.c_str()) };
+    CHECK_GE(uniform_location, 0, "Could not find uniform " + uniform_name);
+    return uniform_location;
+}
+
+
+
+
+
 
 //----------------------------------------------------------------
 Shader::Shader()

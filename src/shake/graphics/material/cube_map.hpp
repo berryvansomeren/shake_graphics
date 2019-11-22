@@ -4,8 +4,6 @@
 #include <memory>
 #include <cstdint>
 
-#include <glad/glad.h>
-
 #include "shake/core/contracts/contracts.hpp"
 #include "shake/core/types/macro_non_copyable.hpp"
 #include "shake/graphics/material/texture_parameters.hpp"

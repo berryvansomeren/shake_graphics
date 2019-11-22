@@ -40,7 +40,7 @@ public:
 
     virtual void draw() const override;
 
-protected:
+public:
     virtual ~Primitive3D() override = default;
 
 private:

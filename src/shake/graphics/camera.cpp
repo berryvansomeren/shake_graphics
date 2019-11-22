@@ -15,12 +15,12 @@ Camera::Camera(size_t screen_width, size_t screen_height)
     , m_screen_height   { screen_height }
     , m_keyboard_speed  { 0.01f }
     , m_mouse_speed     { 0.01f }
-    , m_fov             { glm::radians(45.0f) }
-    , m_transform       { }
+    , m_fov             { glm::radians(90.0f) }
+    , m_transform       { std::make_shared<Transform3D>() }
 {
     update_projection_matrix();
 
-    m_transform.translate( { 0.f, -50.f, 0.f } );
+    m_transform->translate( { 0.f, -5.f, 100.f } );
 }
 
 //----------------------------------------------------------------
@@ -57,7 +57,7 @@ void Camera::update(float dt)
     //}
 
     //m_fov -= glm::radians(mouse.get_scroll_y());
-    m_fov = glm::clamp(m_fov, glm::radians( 1.0f), glm::radians(45.0f));
+    m_fov = glm::clamp(m_fov, glm::radians( 1.0f), glm::radians(90.0f));
     update_projection_matrix();
 }
 

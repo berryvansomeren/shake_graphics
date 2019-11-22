@@ -95,14 +95,24 @@ void disable_face_culling();
 
 
 template<typename T>
-void set_uniform( const int32_t uniform_location, const T& value );
+void set_uniform( const UniformLocation uniform_location, const T& value );
 
-void set_uniform( const int32_t uniform_location, const glm::mat4& value );
-void set_uniform( const int32_t uniform_location, const glm::vec3& value );
-void set_uniform( const int32_t uniform_location, const glm::vec2& value );
-void set_uniform( const int32_t uniform_location, const float& value     );
-void set_uniform( const int32_t uniform_location, const int32_t& value   );
+void set_uniform( const UniformLocation uniform_location, const glm::mat4& value );
+void set_uniform( const UniformLocation uniform_location, const glm::vec3& value );
+void set_uniform( const UniformLocation uniform_location, const glm::vec2& value );
+void set_uniform( const UniformLocation uniform_location, const float& value     );
+void set_uniform( const UniformLocation uniform_location, const int32_t& value   );
 
+
+
+TextureId gen_texture();
+void delete_texture ( const TextureId id );
+void bind_texture   ( const TextureTarget target, const TextureId id );
+void active_texture ( const TextureUnit unit );
+
+void tex_parameter  ( const TextureTarget target, const TextureId id )
+
+void texture_parameter( const TextureId id, )
 
 } // namespace gl
 } // namespace graphics

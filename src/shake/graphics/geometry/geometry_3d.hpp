@@ -15,7 +15,7 @@ public:
 public:
     virtual void draw() const   = 0;
 
-protected:
+public:
     virtual ~AGeometry3D() {}
 };
 
