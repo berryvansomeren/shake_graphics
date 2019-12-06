@@ -4,8 +4,9 @@
 #include <memory>
 
 #include "shake/core/math/math.hpp"
-#include "shake/core/types/underlying_cast.hpp"
+#include "shake/core/type_traits/underlying_cast.hpp"
 
+#include "shake/graphics/gl/gl.hpp"
 #include "shake/graphics/material/cube_map.hpp"
 #include "shake/graphics/material/shader.hpp"
 #include "shake/graphics/material/texture.hpp"
@@ -19,7 +20,7 @@ struct AUniform
     using Ptr = std::unique_ptr<AUniform>;
 
     virtual ~AUniform();
-    virtual void bind( const Shader::Ptr& shader, int32_t uniform_location ) const = 0;
+    virtual void bind( const Shader::Ptr& shader, const gl::UniformLocation uniform_location ) const = 0;
 };
 
 //----------------------------------------------------------------
@@ -29,7 +30,7 @@ struct AUniform
     public: \
         Uniform##name ( uniform_type value ); \
         \
-        virtual void bind( const Shader::Ptr& shader, int32_t uniform_location ) const override \
+        virtual void bind( const Shader::Ptr& shader, const gl::UniformLocation uniform_location ) const override \
         { \
             shader->set_uniform( uniform_location, m_value ); \
         } \
@@ -53,21 +54,21 @@ public:
     UniformTexture
     (
         const Texture::Ptr& texture,
-              TextureUnit   texture_unit
+              gl::TextureUnitIndex   texture_unit
     )
         : m_texture         { texture }
         , m_texture_unit    { texture_unit }
     { }
 
-    virtual void bind( const Shader::Ptr& shader, int32_t uniform_location ) const override
+    virtual void bind( const Shader::Ptr& shader, const gl::UniformLocation uniform_location ) const override
     {
         m_texture->bind( m_texture_unit );
-        shader->set_uniform( uniform_location, static_cast<int32_t>( underlying_cast( m_texture_unit ) ) );
+        shader->set_uniform( uniform_location, m_texture_unit );
     }
 
 private:
     Texture::Ptr    m_texture;
-    TextureUnit     m_texture_unit;
+    gl::TextureUnitIndex     m_texture_unit;
 };
 
 //----------------------------------------------------------------
@@ -77,21 +78,21 @@ public:
     UniformCubeMap
     (
         const CubeMap::Ptr& cube_map,
-              TextureUnit   texture_unit
+              gl::TextureUnitIndex   texture_unit
     )
         : m_cube_map { cube_map }
         , m_texture_unit { texture_unit }
     { }
 
-    virtual void bind( const Shader::Ptr& shader, int32_t uniform_location ) const override
+    virtual void bind( const Shader::Ptr& shader, const gl::UniformLocation uniform_location ) const override
     {
         m_cube_map->bind( m_texture_unit );
-        shader->set_uniform( uniform_location, static_cast<int32_t>( underlying_cast( m_texture_unit ) ) );
+        shader->set_uniform( uniform_location, m_texture_unit );
     }
 
 private:
     CubeMap::Ptr    m_cube_map;
-    TextureUnit     m_texture_unit;
+    gl::TextureUnitIndex     m_texture_unit;
 };
 
 } // namespace graphics

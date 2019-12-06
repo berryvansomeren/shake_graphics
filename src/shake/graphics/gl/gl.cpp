@@ -1,76 +1,120 @@
-#include "context.hpp"
+#include "gl.hpp"
 
 #include <array>
 
 #include <glad/glad.h>
 
+#include "shake/core/data_structures/map.hpp"
+#include "shake/core/contracts/check.hpp"
 #include "shake/core/contracts/contracts.hpp"
+#include "shake/core/macros/macro_define_mapping.hpp"
 #include "shake/core/math/math.hpp"
-#include "shake/core/types/underlying_cast.hpp"
-#include "shake/graphics/gl.hpp"
-#include "shake/graphics/gl_debug_message.hpp"
+#include "shake/core/type_traits/underlying_cast.hpp"
+#include "shake/graphics/gl/gl_debug_message.hpp"
+
+#include "shake/graphics/gl/gl_context.hpp"
 
 namespace shake {
 namespace graphics {
 namespace gl {
 
 namespace { // anonymous
+    
+DEFINE_MAPPING( GLint, to_glint, PrimitiveType,
+    { PrimitiveType::Lines,         GL_LINES            },
+    { PrimitiveType::LineLoop,      GL_LINE_LOOP        },
+    { PrimitiveType::LineStrip,     GL_LINE_STRIP       },
+    { PrimitiveType::Triangles,     GL_TRIANGLES        },
+    { PrimitiveType::TriangleStrip, GL_TRIANGLE_STRIP   },
+    { PrimitiveType::TriangleFan,   GL_TRIANGLE_FAN     }
+)
 
-uint32_t current_shader_id      = 0;
-uint32_t current_vbo_id         = 0;
-uint32_t current_ebo_id         = 0;
-uint32_t current_vao_id         = 0;
+DEFINE_MAPPING( GLint, to_glint, FramebufferBitFlag, 
+    { FramebufferBitFlag::Color,    GL_COLOR_BUFFER_BIT },
+    { FramebufferBitFlag::Depth,    GL_DEPTH_BUFFER_BIT }
+)
 
-std::array<uint32_t, 16> current_texture_unit_ids = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+DEFINE_MAPPING( GLint, to_glenum, PolygonMode, 
+    { PolygonMode::Line,            GL_LINE             },
+    { PolygonMode::Fill,            GL_FILL             }
+)
 
-PolygonMode current_polygon_mode = PolygonMode::Fill;
+DEFINE_MAPPING( GLenum, to_glenum, BufferTarget,
+    { BufferTarget::ArrayBuffer,        GL_ARRAY_BUFFER             },
+    { BufferTarget::ElementArrayBuffer, GL_ELEMENT_ARRAY_BUFFER     }
+)
 
-bool is_depth_test_enabled      = false;
-bool is_face_culling_enabled    = false;
-bool is_depth_mask_enabled      = false;
+DEFINE_MAPPING( GLenum, to_glenum, Usage,
+    { Usage::StaticDraw, GL_STATIC_DRAW }
+)
 
-GLenum PrimitiveTypeToGlMode( const PrimitiveType primitive_type )
+DEFINE_MAPPING( GLenum, to_glenum, TextureTarget,
+    { TextureTarget::_2D, GL_TEXTURE_2D }
+)
+
+DEFINE_MAPPING( GLenum, to_glenum, ShaderType,
+    { ShaderType::Vertex,   GL_VERTEX_SHADER    },
+    { ShaderType::Fragment, GL_FRAGMENT_SHADER  }
+)
+
+DEFINE_MAPPING( bool, to_bool, GLint,
+    { GL_TRUE,  true    },
+    { GL_FALSE, false   }
+)
+
+DEFINE_MAPPING( GLenum, to_glenum, SizedInternalFormat,
+    { SizedInternalFormat::RGBA8,    GL_RGBA8   }
+)
+
+DEFINE_MAPPING( GLenum, to_glenum, TextureFormat,
+    { TextureFormat::R,       GL_RED      },
+    { TextureFormat::RGB,     GL_RGB      },
+    { TextureFormat::RGBA,    GL_RGBA     }
+)
+
+DEFINE_MAPPING( GLenum, to_glint, TextureWrap,
+    { TextureWrap::ClampToEdge,  GL_CLAMP_TO_EDGE   }
+)
+
+DEFINE_MAPPING( GLenum, to_glint, Filter,
+    { Filter::Linear,    GL_LINEAR   },
+    { Filter::Nearest,   GL_NEAREST  }
+)
+
+DEFINE_MAPPING( GLenum, to_glenum, Type,
+    { Type::UnsignedByte,    GL_UNSIGNED_BYTE   }
+)
+
+inline GLsizei to_glsizei( const SizeI size )
 {
-    switch ( primitive_type )
-    {
-    case PrimitiveType::Lines:          return GL_LINES;            break;
-    case PrimitiveType::LineLoop:       return GL_LINE_LOOP;        break;
-    case PrimitiveType::LineStrip:      return GL_LINE_STRIP;       break;
-    case PrimitiveType::Triangles:      return GL_TRIANGLES;        break;
-    case PrimitiveType::TriangleStrip:  return GL_TRIANGLE_STRIP;   break;
-    case PrimitiveType::TriangleFan:    return GL_TRIANGLE_FAN;     break;
-    default: CHECK_FAIL( "Unsupported PrimitiveType" ); break;
-    }
-
-    return std::uno
+    return static_cast<GLsizei>( *size );
 }
 
-uint32_t framebuffer_bit_flag_to_gl( const FramebufferBitFlag framebuffer_bit_flag )
+inline GLint to_glint( const std::uint64_t v )
 {
-    if ( framebuffer_bit_flag == FramebufferBitFlag::Color ) { return GL_COLOR_BUFFER_BIT; }
-    if ( framebuffer_bit_flag == FramebufferBitFlag::Depth ) { return GL_DEPTH_BUFFER_BIT; }
-    CHECK_FAIL( "Unsupported FramebufferBitFlag" );
+    return static_cast<GLint>( v );
 }
 
-uint32_t polygon_mode_to_gl( const PolygonMode polygon_mode )
+inline GLint to_glint( const TextureUnitIndex v )
 {
-    if ( polygon_mode == PolygonMode::Line ) { return GL_LINE; }
-    if ( polygon_mode == PolygonMode::Fill ) { return GL_FILL; }
-    CHECK_FAIL( "Unsupported PolygonMode" );
+    return static_cast<GLint>( *v );
 }
+
 
 } // namespace anonymous
 
-void init( const GLLoadProc& gl_load_proc )
+
+//----------------------------------------------------------------
+void init( const LoaderFunctionAddress& gl_load_proc )
 {
-    const auto load_success = gladLoadGLLoader( ( GLADloadproc ) gl_load_proc );
+    const auto load_success = gladLoadGLLoader( ( LoaderFunctionAddress ) gl_load_proc );
     if ( !load_success ) 
     {
         CHECK_FAIL( "Could not initialize OpenGl Context" );
     }
     glGetString(GL_VERSION); // todo remove
 
-    glDebugMessageCallback( (GLDEBUGPROC) debug_message::callback, 0 );
+    glDebugMessageCallback( (GLDEBUGPROC) gl::debug_message::callback, 0 );
 
     // Enable depth (Z) buffer (accept "closest" fragment)
     enable_depth_test();
@@ -92,141 +136,321 @@ void init( const GLLoadProc& gl_load_proc )
 void clear ( std::vector<FramebufferBitFlag> framebuffer_bit_flags )
 {
     int flags_combined { 0 };
-    for ( const auto& flag : framebuffer_bit_flags ) { flags_combined |= framebuffer_bit_flag_to_gl( flag ); }
+    for ( const auto& flag : framebuffer_bit_flags ) { flags_combined |= to_glint( flag ); }
     glClear( flags_combined );
 }
 
-uint32_t    get_current_shader_id()                     { return current_shader_id;         }
-void        set_current_shader_id( uint32_t shader_id ) { current_shader_id = shader_id;    }
 
-uint32_t    get_current_vbo_id()                        { return current_vbo_id;            }
-void        set_current_vbo_id( uint32_t vbo_id )       { current_vbo_id = vbo_id;          }
-
-uint32_t    get_current_ebo_id()                        { return current_ebo_id;            }
-void        set_current_ebo_id( uint32_t ebo_id )       { current_ebo_id = ebo_id;          }
-
-uint32_t    get_current_vao_id()                        { return current_vao_id;            }
-void        set_current_vao_id( uint32_t vao_id )       { current_vao_id = vao_id;          }
-
-uint32_t    get_current_texture_id( uint8_t texture_unit_index )                        { return current_texture_unit_ids[texture_unit_index];        }
-void        set_current_texture_id( uint8_t texture_unit_index, uint32_t texture_id )   { current_texture_unit_ids[texture_unit_index] = texture_id;  }
-
-PolygonMode get_current_polygon_mode() { return current_polygon_mode; }
-void        set_current_polygon_mode( const PolygonMode polygon_mode )
-{
-    current_polygon_mode = polygon_mode;
-    glPolygonMode( GL_FRONT_AND_BACK, polygon_mode_to_gl( polygon_mode ) );
-}
-
-void draw_primitive( const Primitive2D& primitive )
-{
-    primitive.get_has_index_buffer()
-        ? draw_elements( primitive.get_type(), primitive.get_count() )
-        : draw_arrays(   primitive.get_type(), primitive.get_count() );
-}
-
-void draw_primitive( const Primitive3D& primitive )
-{
-    primitive.get_has_index_buffer()
-        ? draw_elements( primitive.get_type(), primitive.get_count() )
-        : draw_arrays(   primitive.get_type(), primitive.get_count() );
-}
+//void draw_primitive( const Primitive2D& primitive )
+//{
+//    primitive.get_has_index_buffer()
+//        ? draw_elements( primitive.get_type(), primitive.get_count() )
+//        : draw_arrays(   primitive.get_type(), primitive.get_count() );
+//}
+//
+//void draw_primitive( const Primitive3D& primitive )
+//{
+//    primitive.get_has_index_buffer()
+//        ? draw_elements( primitive.get_type(), primitive.get_count() )
+//        : draw_arrays(   primitive.get_type(), primitive.get_count() );
+//}
 
 void draw_arrays( const PrimitiveType primitive_type, const size_t count,  const size_t first )
 {
-    glDrawArrays( PrimitiveTypeToGlMode( primitive_type ), first, count );
+    glDrawArrays( to_glint( primitive_type ), first, count );
 }
 
 void draw_elements( const PrimitiveType primitive_type, const size_t count )
 {
-    glDrawElements( PrimitiveTypeToGlMode( primitive_type ), count, GL_UNSIGNED_INT, nullptr );
+    glDrawElements( to_glint( primitive_type ), count, GL_UNSIGNED_INT, nullptr );
 }
 
 void draw_elements_instanced( const PrimitiveType primitive_type, const size_t index_count, const size_t instance_count )
 {
-    glDrawElementsInstanced( PrimitiveTypeToGlMode( primitive_type ), index_count, GL_UNSIGNED_INT, nullptr, instance_count );
+    glDrawElementsInstanced( to_glint( primitive_type ), index_count, GL_UNSIGNED_INT, nullptr, instance_count );
 }
 
 void enable_depth_mask()    
 {
-    if ( !is_depth_mask_enabled   ) 
-    { 
-        glDepthMask(GL_TRUE);       
-        is_depth_mask_enabled = true;       
-    } 
+    if ( !context.is_depth_mask_enabled() )
+    {
+        glDepthMask(GL_TRUE);    
+        context.is_depth_mask_enabled() = true;
+    }
 }
 
 void disable_depth_mask()   
 { 
-    if ( is_depth_mask_enabled ) 
-    { 
-        glDepthMask(GL_FALSE);      
-        is_depth_mask_enabled = false;      
-    } 
+    if ( context.is_depth_mask_enabled() )
+    {
+        glDepthMask(GL_FALSE); 
+        context.is_depth_mask_enabled() = false;
+    }
 }
 
 void enable_depth_test()    
 { 
-    if ( !is_depth_test_enabled ) 
-    { 
-        glEnable(GL_DEPTH_TEST);    
-        is_depth_test_enabled = true;       
-    } 
+    if ( !context.is_depth_test_enabled() )
+    {
+        glEnable(GL_DEPTH_TEST);  
+        context.is_depth_test_enabled() = true;
+    }
 }
 
 void disable_depth_test()   
 { 
-    if ( is_depth_test_enabled ) 
-    { 
-        glDisable(GL_DEPTH_TEST);   
-        is_depth_test_enabled = false;      
-    } 
+    if ( context.is_depth_test_enabled() )
+    {
+        glDisable(GL_DEPTH_TEST);  
+        context.is_depth_test_enabled() = false;
+    }
 }
 
 void enable_face_culling()  
 { 
-    if ( !is_face_culling_enabled ) 
-    { 
-        glEnable(GL_CULL_FACE);     
-        is_face_culling_enabled = true;     
-    } 
+    if ( !context.is_face_culling_enabled() )
+    {
+        glEnable(GL_CULL_FACE); 
+        context.is_face_culling_enabled() = true;
+    }
 }
 
 void disable_face_culling()
 { 
-    if ( is_face_culling_enabled  ) 
-    { 
-        glDisable(GL_CULL_FACE);    
-        is_face_culling_enabled = false;    
-    } 
+    if ( context.is_face_culling_enabled() )
+    {
+        glDisable(GL_CULL_FACE);  
+        context.is_face_culling_enabled() = false;
+    }
+}
+
+void set_current_polygon_mode( const PolygonMode polygon_mode )
+{
+    if ( context.current_polygon_mode() != polygon_mode )
+    {
+        glPolygonMode( GL_FRONT_AND_BACK, to_glenum( polygon_mode ) );
+        context.current_polygon_mode() = polygon_mode;
+    }
+}
+
+
+ProgramId create_program()
+{
+    return ProgramId { glCreateProgram() };
+}
+
+void use_program( const ProgramId id )
+{
+    glUseProgram( *id );
+}
+
+void delete_program( const ProgramId id )
+{
+    glDeleteProgram( *id );
+}
+
+void link_program( const ProgramId id )
+{
+    glLinkProgram( *id );
+}
+
+bool get_program_iv_link_status( const ProgramId id )
+{
+    auto link_status = GLint { };
+    glGetProgramiv( *id, GL_LINK_STATUS, &link_status );
+    return to_bool( link_status );
+}
+
+void validate_program( const ProgramId id )
+{
+    glValidateProgram( *id );
+}
+
+bool get_program_iv_validate_status( const ProgramId id )
+{
+    auto validate_status = GLint { };
+    glGetProgramiv( *id, GL_VALIDATE_STATUS, &validate_status );
+    return to_bool( validate_status );
+}
+
+namespace { // anonymous
+
+
+std::size_t get_program_iv_info_log_length( const ProgramId id )
+{
+    auto log_length = GLint { };
+    glGetProgramiv( *id, GL_INFO_LOG_LENGTH, &log_length );
+    return static_cast< std::size_t >( log_length );
+}
+
+bool get_program_iv_validate_status( const ProgramId id )
+{
+    auto validate_status = GLint { };
+    glGetProgramiv( *id, GL_VALIDATE_STATUS, &validate_status );
+    return to_bool( validate_status );
+}
+
+std::string get_program_info_log( const ProgramId id, std::size_t log_length )
+{
+    auto buffer = std::vector<GLchar>( log_length );
+    glGetProgramInfoLog( *id, log_length, nullptr, buffer.data() );
+    const auto message = std::string { std::begin( buffer ), std::end( buffer ) };
+    return message;
+}
+
+} // namespace anonymous
+
+std::string get_program_info_log( const ProgramId program_id )
+{
+    const auto log_length = gl::get_program_iv_info_log_length( program_id );
+    return get_program_info_log( program_id, log_length );
 }
 
 
 
-
-void set_uniform(const int32_t uniform_location, const glm::mat4& value)
+ShaderId create_shader( const ShaderType type )
 {
-    glUniformMatrix4fv(uniform_location, 1, GL_FALSE, glm::value_ptr(value));
+    return ShaderId { glCreateShader( to_glenum( type ) ) };
 }
 
-void set_uniform(const int32_t uniform_location, const glm::vec3& value)
+void compile_shader( const ShaderId id )
 {
-    glUniform3f(uniform_location, value.x, value.y, value.z);
+    glCompileShader( *id );
 }
 
-void set_uniform(const int32_t uniform_location, const glm::vec2& value)
+void shader_source( const ShaderId id, const std::string& source )
 {
-    glUniform2f(uniform_location, value.x, value.y);
+    const char* source_ptr { source.c_str() };
+    glShaderSource( *id, 1, &source_ptr, nullptr );
 }
 
-void set_uniform(const int32_t uniform_location, const float& value)
+void delete_shader( const ShaderId id )
 {
-    glUniform1f(uniform_location, value);
+    glDeleteShader( *id );
 }
 
-void set_uniform(const int32_t uniform_location, const int32_t& value)
+void attach_shader( const ProgramId program_id, const ShaderId shader_id )
 {
-    glUniform1i(uniform_location, value);
+    glAttachShader( *program_id, *shader_id );
+}
+
+bool get_shader_iv_compile_status( const ShaderId id )
+{
+    auto compile_status = GLint { };
+    glGetShaderiv( *id, GL_COMPILE_STATUS, &compile_status );
+    return to_bool( compile_status );
+}
+
+namespace { // anonymous
+
+std::size_t get_shader_iv_info_log_length( const ShaderId id )
+{
+    auto log_length = GLint { };
+    glGetShaderiv( *id, GL_INFO_LOG_LENGTH, &log_length );
+    return static_cast< std::size_t >( log_length );
+}
+
+std::string get_shader_info_log( const ShaderId id, std::size_t log_length )
+{
+    auto buffer = std::vector<GLchar>( log_length );
+    glGetShaderInfoLog( *id, log_length, nullptr, buffer.data() );
+    const auto message = std::string { std::begin( buffer ), std::end( buffer ) };
+    return message;
+}
+
+} // namespace anonymous
+
+std::string get_shader_info_log( const ShaderId shader_id )
+{
+    const auto log_length = gl::get_shader_iv_info_log_length( shader_id );
+    return get_shader_info_log( shader_id, log_length );
+}
+
+UniformLocation get_uniform_location( const ProgramId id, const std::string& name )
+{
+    const auto uniform_location = glGetUniformLocation( *id, name.c_str() );
+    CHECK_GE( uniform_location, 0, "Could not find uniform " + name );
+    return UniformLocation { uniform_location };
+}
+
+void set_uniform( UniformLocation location, const glm::mat4& value )
+{
+    glUniformMatrix4fv( *location, 1, GL_FALSE, glm::value_ptr( value ) );
+}
+
+void set_uniform( const UniformLocation location, const glm::vec3& value )
+{
+    glUniform3f( *location, value.x, value.y, value.z );
+}
+
+void set_uniform( const UniformLocation location, const glm::vec2& value )
+{
+    glUniform2f( *location, value.x, value.y );
+}
+
+void set_uniform( const UniformLocation location, const float& value )
+{
+    glUniform1f( *location, value );
+}
+
+void set_uniform( const UniformLocation location, const int32_t& value )
+{
+    glUniform1i( *location, value );
+}
+
+void set_uniform( const UniformLocation location, const TextureUnitIndex value )
+{
+    glUniform1i( *location, to_glint( value ) );
+}
+
+
+
+BufferId gen_buffer()
+{
+    auto id = GLuint { };
+    glGenBuffers( 1, &id );
+    return BufferId { id };
+}
+
+void delete_buffer( const BufferId id )
+{
+    glDeleteBuffers( 1, &id );
+}
+
+void bind_buffer( const BufferTarget target, const BufferId id )
+{
+    glBindBuffer( to_glenum( target ), *id );
+}
+
+void buffer_data( const BufferId id, const SizeI size, const void* data, const Usage usage )
+{
+    glNamedBufferData( *id, *size, data, to_glenum( usage ) );
+}
+
+
+VaoId gen_vertex_array()
+{
+    auto id = GLuint { };
+    glGenVertexArrays( 1, &id );
+    return VaoId { id };
+}
+
+void delete_vertex_array( const VaoId id )
+{
+    glDeleteVertexArrays( 1, &id );
+}
+
+void bind_vertex_array( const VaoId id )
+{
+    //if ( id != gl::current_vao_id() )
+    //{
+    //    gl::VaoId() = id;
+    //    glBindVertexArray( *id );
+    //}
+    //else
+    {
+        LOG( "Trying to bind a VAO while it is already bound." );
+    }
 }
 
 
@@ -240,18 +464,93 @@ TextureId gen_texture()
 
 void delete_texture( const TextureId id )
 {
-    glDeleteTextures( 1, *id );
+    glDeleteTextures( 1, &id );
 }
 
 void bind_texture( const TextureTarget target, const TextureId id )
 {
-    glBindTexture( *target, *id );
+    glBindTexture( to_glenum( target ), *id );
+    auto& active_texture_unit = context.texture_units().at( *context.active_texture_unit_index() );
+    active_texture_unit.currently_bound_texture_target = target;
+    active_texture_unit.currently_bound_texture_id = id;
 }
 
-void active_texture( const TextureUnit unit )
+void active_texture( const TextureUnitIndex texture_unit_index )
 {
-    glActiveTexture( *unit );
+    if ( context.active_texture_unit_index() != texture_unit_index )
+    {
+        glActiveTexture( *texture_unit_index );
+        context.active_texture_unit_index() = texture_unit_index;
+    }
 }
+
+void enable_vertex_array_attrib( const VaoId id, const AttributeIndex index )
+{
+    glEnableVertexArrayAttrib( *id, *index );
+}
+
+void texture_parameter( const TextureId id, const TextureWrap wrap )
+{
+    const auto glint_wrap = to_glint( wrap );
+    glTextureParameteri( *id, GL_TEXTURE_WRAP_S, glint_wrap );
+    glTextureParameteri( *id, GL_TEXTURE_WRAP_T, glint_wrap );
+    glTextureParameteri( *id, GL_TEXTURE_WRAP_R, glint_wrap );
+}
+
+void texture_parameter( const TextureId id, const Filter filter )
+{
+    const auto glint_filter = to_glint( filter );
+    glTextureParameteri( *id, GL_TEXTURE_MIN_FILTER, glint_filter );
+    glTextureParameteri( *id, GL_TEXTURE_MAG_FILTER, glint_filter );
+}
+
+void texture_storage_2d
+(
+    const TextureId id,
+    const uint8_t n_levels,
+    const SizedInternalFormat internal_format,
+    const SizeI width,
+    const SizeI height
+)
+{
+    glTextureStorage2D
+    (
+        *id,
+        n_levels,
+        to_glenum( internal_format ),
+        static_cast<GLsizei>( *width ),
+        static_cast<GLsizei>( *height )
+    );
+}
+
+
+void texture_sub_image_2d
+(
+    const TextureId id,
+    const uint8_t level,
+    const std::uint64_t x_offset,
+    const std::uint64_t y_offset,
+    const SizeI width,
+    const SizeI height,
+    const TextureFormat format,
+    const Type          type,
+    const void*         data
+)
+{
+    glTextureSubImage2D
+    (
+        *id, 
+        level,
+        to_glint( x_offset ),
+        to_glint( y_offset ),
+        to_glsizei( width ),
+        to_glsizei( height ),
+        to_glenum( format ),
+        to_glenum( type ),
+        data
+    );
+}
+
 
 } // namespace gl
 } // namespace graphics

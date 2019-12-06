@@ -1,6 +1,6 @@
 #include "voxel_grid.hpp"
 
-#include "shake/graphics/gl.hpp"
+#include "shake/graphics/gl/gl.hpp"
 
 namespace shake     {
 namespace graphics  {
@@ -31,9 +31,6 @@ VoxelGrid::VoxelGrid
     // set instance data
     m_vbo_instances.bind();
     m_vao.specify_enable_vertex_format_instanced( VertexFormats::VoxelIdx3Tex2 );
-
-    // vao is now finished
-    m_vao.unbind();
 
     for (uint16_t z { 0 }; z < m_depth; ++z)
     {
@@ -83,7 +80,6 @@ void VoxelGrid::update_buffers()
     }
     m_vbo_instances.bind();
     m_vbo_instances.set_data(instance_data);
-    m_vbo_instances.unbind();
 
     m_instance_count = instance_data.size() / 5;
 }
@@ -124,11 +120,10 @@ void VoxelGrid::draw() const
     m_vao.bind();
     gl::draw_elements_instanced
     (
-        PrimitiveType::Triangles,
+        gl::PrimitiveType::Triangles,
         m_index_count,
         m_instance_count
     );
-    m_vao.unbind();
 }
 
 } // namespace graphics

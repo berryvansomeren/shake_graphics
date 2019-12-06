@@ -7,8 +7,9 @@
 #include <glad/glad.h>
 
 #include "shake/core/contracts/contracts.hpp"
-#include "shake/core/types/macro_non_copyable.hpp"
+#include "shake/core/macros/macro_non_copyable.hpp"
 //#include "shake/io/path.hpp"
+#include "shake/graphics/gl/gl.hpp"
 #include "shake/graphics/material/texture_parameters.hpp"
 
 namespace shake {
@@ -22,13 +23,11 @@ public:
 public:
     Texture
     (
-        const uint8_t*          image_ptr,
-        const uint32_t          width,
-        const uint32_t          height,
-        const ImageFormat       image_format,
-        const TextureFormat     texture_format,
-        const InterpolationMode interpolation_mode,
-        const bool              generate_mip_maps
+        const uint8_t*              image_ptr,
+        const uint32_t              width,
+        const uint32_t              height,
+        const gl::TextureFormat     texture_format,
+        const gl::Filter            filter
     );
 
     ~Texture();
@@ -38,13 +37,12 @@ public:
     inline int  get_width   ()  const   { return m_width;   }
     inline int  get_height  ()  const   { return m_height;  }
 
-    void bind   ( TextureUnit texture_unit_id ) const;
-    void unbind ()                          const;
+    void bind   ( gl::TextureUnitIndex texture_unit_id ) const;
 
 private:
     std::uint32_t	m_width;
     std::uint32_t	m_height;
-    std::uint32_t   m_id;
+    gl::TextureId   m_id;
 };
 
 } // namespace graphics

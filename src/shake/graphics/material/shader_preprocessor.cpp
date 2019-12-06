@@ -1,7 +1,7 @@
 #include "shader_preprocessor.hpp"
 
 #include "shake/core/contracts/contracts.hpp"
-#include "shake/core/types/underlying_cast.hpp"
+#include "shake/core/type_traits/underlying_cast.hpp"
 
 #include "shake/graphics/vertex_attribute.hpp"
 
@@ -42,13 +42,13 @@ std::string get_default_fragment_shader_defines()
 class ShaderPreprocessor
 {
 public:
-    std::string Preprocess( const std::string& shader_source, const ShaderType shader_type ) const
+    std::string Preprocess( const std::string& shader_source, const gl::ShaderType shader_type ) const
     {
         auto result = std::string{ get_default_shader_defines() };
         switch (shader_type)
         {
-        case ShaderType::Vertex:    result += get_default_vertex_shader_defines();      break;
-        case ShaderType::Fragment:  result += get_default_fragment_shader_defines();    break;
+        case gl::ShaderType::Vertex:    result += get_default_vertex_shader_defines();      break;
+        case gl::ShaderType::Fragment:  result += get_default_fragment_shader_defines();    break;
         default: CHECK_FAIL( "Did not recognize shader type." ); break;
         }
         result += shader_source;
@@ -60,7 +60,7 @@ ShaderPreprocessor g_shader_preprocessor {};
 
 } // namespace anonymous
 
-std::string Preprocess( const std::string& shader_source, const ShaderType shader_type )
+std::string Preprocess( const std::string& shader_source, const gl::ShaderType shader_type )
 {
     return g_shader_preprocessor.Preprocess( shader_source, shader_type );
 }

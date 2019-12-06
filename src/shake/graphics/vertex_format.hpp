@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "shake/core/types/underlying_cast.hpp"
+#include "shake/core/type_traits/underlying_cast.hpp"
 
 #include "shake/graphics/vertex_attribute.hpp"
 

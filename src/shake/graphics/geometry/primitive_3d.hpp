@@ -2,9 +2,10 @@
 #define GRAPHICS_PRIMITIVE_3D_HPP
 
 #include "shake/core/math/math.hpp"
-#include "shake/core/types/macro_non_copyable.hpp"
-#include "shake/core/types/macro_property.hpp"
+#include "shake/core/macros/macro_non_copyable.hpp"
+#include "shake/core/macros/macro_property.hpp"
 
+#include "shake/graphics/gl/gl.hpp"
 #include "shake/graphics/geometry/geometry_3d.hpp"
 
 #include "shake/graphics/buffer_objects/vao.hpp"
@@ -25,14 +26,14 @@ public:
 
     Primitive3D
     (
-        const PrimitiveType             primitive_type,
+        const gl::PrimitiveType         primitive_type,
         const std::vector<float>&       vertices,
         const VertexFormat&             vertex_format = VertexFormats::Pos3
     );
 
     Primitive3D
     (
-        const PrimitiveType             primitive_type,
+        const gl::PrimitiveType         primitive_type,
         const std::vector<float>&       vertices,
         const std::vector<uint32_t>&    indices,
         const VertexFormat&             vertex_format = VertexFormats::Pos3
@@ -44,10 +45,10 @@ public:
     virtual ~Primitive3D() override = default;
 
 private:
-    PROPERTY_R( PrimitiveType,  type                )
-    PROPERTY_R( bool,           has_index_buffer    )
-    PROPERTY_R( size_t,         count               )
-    PROPERTY_R( Vao,            vao                 )
+    PROPERTY_R( gl::PrimitiveType,  type                )
+    PROPERTY_R( bool,               has_index_buffer    )
+    PROPERTY_R( size_t,             count               )
+    PROPERTY_R( Vao,                vao                 )
 };
 
 //----------------------------------------------------------------
@@ -58,7 +59,7 @@ private:
         classname##3D( const std::vector<float>& vertices ) \
             : Primitive3D \
         ( \
-            PrimitiveType::classname, \
+            gl::PrimitiveType::classname, \
             vertices \
         ) \
         { } \
@@ -66,7 +67,7 @@ private:
         classname##3D( const std::vector<glm::vec3>& vertices ) \
             : Primitive3D \
         ( \
-            PrimitiveType::classname, \
+            gl::PrimitiveType::classname, \
             math::convert_to_vector_of_floats( vertices ) \
         ) \
         { } \

@@ -2,6 +2,8 @@
 
 #include "shake/graphics/context.hpp"
 
+#include "shake/graphics/gl/gl_enum.hpp"
+
 
 namespace shake     {
 namespace graphics  {
@@ -26,8 +28,6 @@ void draw
     shader->set_uniform( "u_color", glm::vec3( 1.f ) );
 
     geometry->draw();
-
-    material->unbind();
 }
 
 //----------------------------------------------------------------
@@ -51,8 +51,21 @@ void draw
     // shader->set_uniform( "u_color", glm::vec3( 1.f ) );
 
     geometry->draw();
+}
 
-    material->unbind();
+
+void draw( const Primitive2D& primitive )
+{
+    primitive.get_has_index_buffer()
+        ? gl::draw_elements( primitive.get_type(), primitive.get_count() )
+        : gl::draw_arrays(   primitive.get_type(), primitive.get_count() );
+}
+
+void draw( const Primitive3D& primitive )
+{
+    primitive.get_has_index_buffer()
+        ? gl::draw_elements( primitive.get_type(), primitive.get_count() )
+        : gl::draw_arrays(   primitive.get_type(), primitive.get_count() );
 }
 
 } // namespace graphics

@@ -1,11 +1,14 @@
 #ifndef CUBE_MAP_HPP
 #define CUBE_MAP_HPP
 
+#include <array>
 #include <memory>
 #include <cstdint>
 
+#include "shake/graphics/gl/gl.hpp"
+
 #include "shake/core/contracts/contracts.hpp"
-#include "shake/core/types/macro_non_copyable.hpp"
+#include "shake/core/macros/macro_non_copyable.hpp"
 #include "shake/graphics/material/texture_parameters.hpp"
 
 namespace shake {
@@ -32,24 +35,21 @@ public:
     using ImageData = std::array<ImageInfo, n_cube_faces>;
 
 public:
-    CubeMap
+    CubeMap::CubeMap
     (
-        const ImageData&        image_data,
-        const ImageFormat       image_format,
-        const TextureFormat     texture_format,
-        const InterpolationMode interpolation_mode,
-        const bool              generate_mip_maps
+        const ImageData&            image_data,
+        const gl::TextureFormat     texture_format,
+        const gl::Filter            filter
     );
 
     ~CubeMap();
 
     NON_COPYABLE( CubeMap )
 
-    void bind   ( TextureUnit texture_unit_id ) const;
-    void unbind () const;
+    void bind( gl::TextureUnitIndex texture_unit ) const;
 
 private:
-    std::uint32_t   m_id;
+    gl::TextureId m_id;
 };
 
 } // namespace graphics

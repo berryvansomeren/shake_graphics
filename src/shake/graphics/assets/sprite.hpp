@@ -2,7 +2,7 @@
 #define SPRITE_HPP
 
 #include "shake/core/math/math.hpp"
-#include "shake/core/types/macro_property.hpp"
+#include "shake/core/macros/macro_property.hpp"
 #include "shake/graphics/material/texture.hpp"
 #include "shake/graphics/geometry/geometry_2d.hpp"
 

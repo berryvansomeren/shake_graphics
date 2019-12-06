@@ -12,7 +12,6 @@ def get_target_definitions() -> List[ Target ] :
         dependencies = [
             'glad',
             'glm',
-            'glfw',
             'shake_core'
         ]
     )

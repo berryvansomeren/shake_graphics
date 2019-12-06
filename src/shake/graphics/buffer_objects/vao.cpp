@@ -3,9 +3,8 @@
 #include <glad/glad.h>
 
 #include "shake/core/contracts/contracts.hpp"
-#include "shake/core/types/underlying_cast.hpp"
+#include "shake/core/type_traits/underlying_cast.hpp"
 
-#include "shake/graphics/gl.hpp"
 #include "shake/graphics/buffer_objects/ebo.hpp"
 #include "shake/graphics/buffer_objects/vao.hpp"
 #include "shake/graphics/buffer_objects/vbo.hpp"
@@ -15,30 +14,19 @@ namespace graphics {
 
 //----------------------------------------------------------------
 Vao::Vao()
-{
-    glGenVertexArrays( 1, &m_id);
-}
+: m_id { gl::gen_vertex_array() }
+{ }
 
 //----------------------------------------------------------------
 Vao::~Vao()
 {
-    glDeleteVertexArrays( 1, &m_id);
+    gl::delete_vertex_array( m_id );
 }
 
 //----------------------------------------------------------------
 void Vao::bind() const
 {
-    CHECK_NE(m_id, gl::get_current_vao_id(), "Trying to bind a VAO while it is already bound.");
-    gl::set_current_vao_id(m_id);
-    glBindVertexArray(m_id);
-}
-
-//----------------------------------------------------------------
-void Vao::unbind() const
-{
-    CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to unbind a VAO while it is not currently bound.");
-    gl::set_current_vao_id(0);
-    glBindVertexArray(0);
+    gl::bind_vertex_array( m_id );
 }
 
 //----------------------------------------------------------------
@@ -79,28 +67,28 @@ void Vao::specify_vertex_attrib
     uint32_t                    offset
 )
 {
-    CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to specify a vertex attribute while the vao is not currently bound.");
+    //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to specify a vertex attribute while the vao is not currently bound.");
     m_vertex_attributes[ underlying_cast( location ) ].specify(location, size, stride, offset);
 }
 
 //----------------------------------------------------------------
 void Vao::enable_vertex_attrib(VertexAttribute::Location location)
 {
-    CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to enable a vertex attribute while the vao is not currently bound.");
+    //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to enable a vertex attribute while the vao is not currently bound.");
     m_vertex_attributes[ underlying_cast( location ) ].enable( location );
 }
 
 //----------------------------------------------------------------
 void Vao::disable_vertex_attrib(VertexAttribute::Location location)
 {
-    CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to disable a vertex attribute while the vao is not currently bound.");
+    //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to disable a vertex attribute while the vao is not currently bound.");
     m_vertex_attributes[ underlying_cast( location ) ].disable( location );
 }
 
 //----------------------------------------------------------------
 void Vao::set_vertex_attrib_divisor ( VertexAttribute::Location location, const uint32_t divisor )
 {
-    CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to disable a vertex attribute while the vao is not currently bound.");
+    //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to disable a vertex attribute while the vao is not currently bound.");
     m_vertex_attributes[ underlying_cast( location ) ].set_divisor( location, divisor );
 }
 
@@ -117,7 +105,6 @@ void fill_vao
     vbo.bind();
     vbo.set_data( vertices );
     vao.specify_enable_vertex_format( vertex_format );
-    vao.unbind();
 }
 
 //----------------------------------------------------------------
@@ -137,7 +124,6 @@ void fill_vao
     ebo.bind();
     ebo.set_data( indices );
     vao.specify_enable_vertex_format( vertex_format );
-    vao.unbind();
 }
 
 } // namespace graphics

@@ -5,7 +5,9 @@
 #include <cstdint>
 #include <vector>
 
-#include "shake/core/types/macro_non_copyable.hpp"
+#include "shake/core/macros/macro_non_copyable.hpp"
+
+#include "shake/graphics/gl/gl.hpp"
 
 namespace shake {
 namespace graphics {
@@ -22,12 +24,11 @@ public:
     NON_COPYABLE( Ebo )
 
     void bind() const;
-    void unbind() const;
 
     void set_data(const std::vector<uint32_t> &data) const;
 
 private:
-    uint32_t m_id;
+    gl::BufferId m_id;
 };
 
 } // namespace graphics

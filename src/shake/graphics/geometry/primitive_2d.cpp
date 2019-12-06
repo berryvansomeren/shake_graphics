@@ -2,7 +2,8 @@
 
 #include "shake/core/contracts/contracts.hpp"
 
-#include "shake/graphics/gl.hpp"
+#include "shake/graphics/gl/gl.hpp"
+#include "shake/graphics/draw.hpp"
 
 namespace shake {
 namespace graphics {
@@ -10,7 +11,7 @@ namespace graphics {
 //----------------------------------------------------------------
 Primitive2D::Primitive2D
 (
-    const PrimitiveType         primitive_type,
+    const gl::PrimitiveType         primitive_type,
     const std::vector<float>&   vertices,
     const VertexFormat&         vertex_format
 
@@ -30,7 +31,7 @@ Primitive2D::Primitive2D
 //----------------------------------------------------------------
 Primitive2D::Primitive2D
 (
-    const PrimitiveType             primitive_type,
+    const gl::PrimitiveType             primitive_type,
     const std::vector<float>&       vertices,
     const std::vector<uint32_t>&    indices,
     const VertexFormat&             vertex_format
@@ -51,8 +52,7 @@ Primitive2D::Primitive2D
 void Primitive2D::draw() const
 {
     m_vao.bind();
-    gl::draw_primitive( *this );
-    m_vao.unbind();
+    shake::graphics::draw( *this );
 }
 
 } // namespace graphics

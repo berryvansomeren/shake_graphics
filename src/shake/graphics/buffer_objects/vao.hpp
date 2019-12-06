@@ -5,8 +5,9 @@
 #include <cstdint>
 #include <array>
 
-#include "shake/core/types/macro_non_copyable.hpp"
+#include "shake/core/macros/macro_non_copyable.hpp"
 
+#include "shake/graphics/gl/gl_int.hpp"
 #include "shake/graphics/vertex_attribute.hpp"
 #include "shake/graphics/vertex_format.hpp"
 
@@ -25,7 +26,6 @@ public:
     NON_COPYABLE( Vao )
 
     void bind() const;
-    void unbind() const;
 
     void specify_enable_vertex_format( const VertexFormat& vertex_format );
 
@@ -44,7 +44,8 @@ public:
     void set_vertex_attrib_divisor  ( VertexAttribute::Location location, const uint32_t divisor );
 
 private:
-    uint32_t                        m_id;
+
+    gl::VaoId m_id;
     std::array<VertexAttribute, 16> m_vertex_attributes;
 };
 

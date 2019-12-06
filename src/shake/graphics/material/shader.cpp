@@ -11,31 +11,22 @@
 
 #include "shader_preprocessor.hpp"
 
-
 namespace shake {
 namespace graphics {
 
 namespace { // anonymous
 
 //----------------------------------------------------------------
-void log_gl_shader_error(GLuint shader)
+void log_gl_shader_error( const gl::ShaderId shader_id )
 {
-    GLint log_length { };
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
-    std::vector<GLchar> buffer(log_length);
-    glGetShaderInfoLog(shader, log_length, nullptr, buffer.data());
-    const std::string message { std::begin(buffer), std::end(buffer) };
+    const auto message = gl::get_shader_info_log( shader_id );
     LOG( message );
 }
 
 //----------------------------------------------------------------
-void log_gl_program_error(GLuint program)
+void log_gl_program_error( const gl::ProgramId program_id )
 {
-    GLint log_length { };
-    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
-    std::vector<GLchar> buffer(log_length);
-    glGetProgramInfoLog(program, log_length, nullptr, buffer.data());
-    const std::string message { std::begin(buffer), std::end(buffer) };
+    const auto message = gl::get_program_info_log( program_id );
     LOG( message );
 }
 
@@ -47,21 +38,13 @@ void log_gl_program_error(GLuint program)
 //----------------------------------------------------------------
 void Shader::bind() const
 {
-    CHECK_NE(m_id, gl::get_current_shader_id(), "Trying to bind a shader while it is already bound.");
-    gl::set_current_shader_id(m_id);
-    glUseProgram(m_id);
+    //CHECK_NE(m_id, gl::get_current_shader_id(), "Trying to bind a shader while it is already bound.");
+    //gl::set_current_shader_id(m_id);
+    gl::use_program( m_id );
 }
 
 //----------------------------------------------------------------
-void Shader::unbind() const
-{
-    CHECK_EQ(m_id, gl::get_current_shader_id(), "Trying to unbind a shader while it is not currently bound.");
-    gl::set_current_shader_id(0);
-    glUseProgram(0);
-}
-
-//----------------------------------------------------------------
-uint32_t Shader::get_program_id() const
+gl::ProgramId Shader::get_program_id() const
 {
     return m_id;
 }
@@ -69,16 +52,13 @@ uint32_t Shader::get_program_id() const
 //----------------------------------------------------------------
 bool Shader::has_uniform( const std::string& uniform_name ) const
 {
-    GLint uniform_location { glGetUniformLocation(m_id, uniform_name.c_str()) };
-    return uniform_location >= 0;
+    return *gl::get_uniform_location( m_id, uniform_name ) >= 0;
 }
 
 //----------------------------------------------------------------
-int32_t Shader::get_uniform_location(const std::string& uniform_name) const
+gl::UniformLocation Shader::get_uniform_location( const std::string& name ) const
 {
-    GLint uniform_location { glGetUniformLocation(m_id, uniform_name.c_str()) };
-    CHECK_GE(uniform_location, 0, "Could not find uniform " + uniform_name);
-    return uniform_location;
+    return gl::get_uniform_location( m_id, name );
 }
 
 
@@ -88,50 +68,48 @@ int32_t Shader::get_uniform_location(const std::string& uniform_name) const
 
 //----------------------------------------------------------------
 Shader::Shader()
-    : m_id { glCreateProgram() }
+    : m_id { gl::create_program() }
 { }
 
 //----------------------------------------------------------------
 Shader::~Shader()
 {
-    glDeleteProgram( m_id );
+    gl::delete_program( m_id );
 }
 
 //----------------------------------------------------------------
-void Shader::attach(const std::string& source, const ShaderType shader_type )
+void Shader::attach( const std::string& source, const gl::ShaderType shader_type )
 {
     const char* source_ptr { source.c_str() };
-    GLuint shader { create( shader_type ) };
-    glShaderSource( shader, 1, &source_ptr, nullptr );
-    glCompileShader( shader );
+    const auto shader_id = create( shader_type );
+    gl::shader_source( shader_id, source );
+    gl::compile_shader( shader_id );
 
     // Display errors
-    GLint compile_status { };
-    glGetShaderiv( shader, GL_COMPILE_STATUS, &compile_status );
+    const auto compile_status = gl::get_shader_iv_compile_status( shader_id );
     if (!compile_status)
     {
-        log_gl_shader_error(shader);
-        assert(false && "Shader did not compile succesfully.");
+        log_gl_shader_error( shader_id );
+        CHECK_FAIL( "Shader did not compile succesfully." );
     }
 
     // Attach shader and free allocated memory
-    glAttachShader(m_id, shader);
-    glDeleteShader(shader);
+    gl::attach_shader( m_id, shader_id );
+    gl::delete_shader( shader_id );
 }
 
 //----------------------------------------------------------------
 void Shader::link()
 {
     // Link all attached shaders
-    glLinkProgram(m_id);
+    gl::link_program( m_id );
 
     // Display errors
-    GLint link_status { };
-    glGetProgramiv(m_id, GL_LINK_STATUS, &link_status);
+    const auto link_status = gl::get_program_iv_link_status( m_id );
     if (!link_status)
     {
         log_gl_program_error(m_id);
-        assert(false && "Shaders could not be linked succesfully");
+        CHECK_FAIL( "Shaders could not be linked succesfully" );
     }
 }
 
@@ -139,14 +117,13 @@ void Shader::link()
 bool Shader::is_valid()
 {
     // Validate linked shader program
-    glValidateProgram(m_id);
+    gl::validate_program( m_id );
 
     // Display errors
-    GLint validate_status { };
-    glGetProgramiv(m_id, GL_VALIDATE_STATUS, &validate_status);
+    const auto validate_status = gl::get_program_iv_validate_status( m_id );
     if (!validate_status)
     {
-        log_gl_program_error(m_id);
+        log_gl_program_error( m_id );
         return false;
     }
     return true;
@@ -157,32 +134,20 @@ std::unique_ptr<Shader> Shader::create_basic(const std::string& vertex_shader_so
 {
     std::unique_ptr<Shader> shader { std::make_unique<Shader>() };
 
-    const auto vertex_source    = shader_preprocessor::Preprocess( vertex_shader_source,    ShaderType::Vertex    );
-    const auto fragment_source  = shader_preprocessor::Preprocess( fragment_shader_source,  ShaderType::Fragment  );
+    const auto vertex_source    = shader_preprocessor::Preprocess( vertex_shader_source,    gl::ShaderType::Vertex    );
+    const auto fragment_source  = shader_preprocessor::Preprocess( fragment_shader_source,  gl::ShaderType::Fragment  );
 
-    shader->attach( vertex_source,   ShaderType::Vertex   );
-    shader->attach( fragment_source, ShaderType::Fragment );
+    shader->attach( vertex_source,   gl::ShaderType::Vertex   );
+    shader->attach( fragment_source, gl::ShaderType::Fragment );
 
     shader->link();
     return shader;
 }
 
 //----------------------------------------------------------------
-GLuint Shader::create( const ShaderType& shader_type )
+gl::ShaderId Shader::create( const gl::ShaderType& type )
 {
-    GLuint shader_id = 0;
-
-    switch (shader_type)
-    {
-    case ShaderType::Vertex:                shader_id = glCreateShader(GL_VERTEX_SHADER);           break;
-    case ShaderType::Fragment:              shader_id = glCreateShader(GL_FRAGMENT_SHADER);         break;
-    case ShaderType::Compute:               shader_id = glCreateShader(GL_COMPUTE_SHADER);          break;
-    case ShaderType::TesselationControl:    shader_id = glCreateShader(GL_TESS_CONTROL_SHADER);     break;
-    case ShaderType::TesselationEvaluation: shader_id = glCreateShader(GL_TESS_EVALUATION_SHADER);  break;
-    default: CHECK_FAIL( "File extensions was not recognised as shader type" );                     break;
-    }
-
-    return shader_id;
+    return gl::create_shader( type );
 }
 } // namespace graphics
 } // namespace shake

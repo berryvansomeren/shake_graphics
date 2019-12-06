@@ -3,9 +3,10 @@
 
 #include "shake/core/math/math.hpp"
 #include "shake/core/math/coordinates.hpp"
-#include "shake/core/types/macro_non_copyable.hpp"
-#include "shake/core/types/macro_property.hpp"
+#include "shake/core/macros/macro_non_copyable.hpp"
+#include "shake/core/macros/macro_property.hpp"
 
+#include "shake/graphics/gl/gl.hpp"
 #include "shake/graphics/geometry/geometry_2d.hpp"
 #include "shake/graphics/vertex_format.hpp"
 #include "shake/graphics/buffer_objects/vao.hpp"
@@ -26,14 +27,14 @@ public:
 
     Primitive2D
     (
-        const PrimitiveType             primitive_type,
+        const gl::PrimitiveType         primitive_type,
         const std::vector<float>&       vertices,
         const VertexFormat&             vertex_format = VertexFormats::Pos2
     );
 
     Primitive2D
     (
-        const PrimitiveType             primitive_type,
+        const gl::PrimitiveType         primitive_type,
         const std::vector<float>&       vertices,
         const std::vector<uint32_t>&    indices,
         const VertexFormat&             vertex_format = VertexFormats::Pos2
@@ -42,10 +43,10 @@ public:
     virtual void draw() const override;
 
 private:
-    PROPERTY_R( PrimitiveType,  type                )
-    PROPERTY_R( bool,           has_index_buffer    )
-    PROPERTY_R( size_t,         count               )
-    PROPERTY_R( Vao,            vao                 )
+    PROPERTY_R( gl::PrimitiveType,  type                )
+    PROPERTY_R( bool,               has_index_buffer    )
+    PROPERTY_R( size_t,             count               )
+    PROPERTY_R( Vao,                vao                 )
 };
 
 
@@ -57,7 +58,7 @@ private:
         classname##2D( const std::vector<glm::vec2>& points ) \
             : Primitive2D \
         ( \
-            PrimitiveType::classname, \
+            gl::PrimitiveType::classname, \
             math::convert_to_vector_of_floats( points ) \
         ) \
         { } \
@@ -80,7 +81,7 @@ public:
     Rectangle2D( const float& width, const float& height )
     : Primitive2D
     (
-        PrimitiveType::TriangleFan,
+        gl::PrimitiveType::TriangleFan,
         compute_vertices( width, height ),
         VertexFormats::Pos2Tex2
     )
@@ -107,7 +108,7 @@ public:
     CircleFilled2D( const float& radius )
     : Primitive2D
     (
-        PrimitiveType::TriangleFan,
+        gl::PrimitiveType::TriangleFan,
         compute_vertices( radius )
     )
     { }

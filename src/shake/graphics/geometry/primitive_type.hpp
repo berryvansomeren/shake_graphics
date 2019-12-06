@@ -4,16 +4,7 @@
 namespace shake {
 namespace graphics {
 
-enum class PrimitiveType
-{
-    Lines,
-    LineStrip,
-    LineLoop,
 
-    Triangles,
-    TriangleStrip,
-    TriangleFan
-};
 
 } // namespace graphics
 } // namespace shake

@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "shake/core/data_structures/map.hpp"
-#include "shake/core/types/macro_property.hpp"
+#include "shake/core/macros/macro_property.hpp"
 #include "shake/graphics/material/uniform.hpp"
 #include "shake/graphics/material/shader.hpp"
 
@@ -27,7 +27,8 @@ public:
     {
         // This replaces the element if it was already present in the map
         const auto uniform_location = m_shader->get_uniform_location( name );
-        m_uniforms[ name ] = UniformSpecification{ uniform_location, std::move( uniform ) };
+        map::erase_if_has( m_uniforms, name );
+        m_uniforms.emplace( name,  UniformSpecification{ uniform_location, std::move( uniform ) } );
         return (*this);
     }
 
@@ -46,16 +47,11 @@ public:
         }
     }
 
-    void unbind() const
-    {
-        m_shader->unbind();
-    }
-
 private:
     struct UniformSpecification
     {
-        int32_t         location;
-        AUniform::Ptr   value;
+        gl::UniformLocation location;
+        AUniform::Ptr       value;
     };
 
     using UniformMap = std::unordered_map<std::string, UniformSpecification>;
