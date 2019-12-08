@@ -22,14 +22,14 @@ std::string get_default_vertex_shader_defines()
     return
         "#define SHAKE_VERTEX_SHADER\n"
 
-        "#define SHAKE_VERTEX_POS2 " + std::to_string( underlying_cast( VertexAttribute::Location::VertexPos2 ) ) + "\n"
-        "#define SHAKE_VERTEX_TEX2 " + std::to_string( underlying_cast( VertexAttribute::Location::VertexTex2 ) ) + "\n"
+        "#define SHAKE_VERTEX_POS2 " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VertexPos2 ) ) + "\n"
+        "#define SHAKE_VERTEX_TEX2 " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VertexTex2 ) ) + "\n"
 
-        "#define SHAKE_VERTEX_POS3 " + std::to_string( underlying_cast( VertexAttribute::Location::VertexPos3 ) ) + "\n"
-        "#define SHAKE_VERTEX_NORM " + std::to_string( underlying_cast( VertexAttribute::Location::VertexNorm ) ) + "\n"
+        "#define SHAKE_VERTEX_POS3 " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VertexPos3 ) ) + "\n"
+        "#define SHAKE_VERTEX_NORM " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VertexNorm ) ) + "\n"
 
-        "#define SHAKE_VOXEL_INDEX " + std::to_string( underlying_cast( VertexAttribute::Location::VoxelIdx3  ) ) + "\n"
-        "#define SHAKE_VOXEL_TEX2 "  + std::to_string( underlying_cast( VertexAttribute::Location::VoxelTex2  ) ) + "\n"
+        "#define SHAKE_VOXEL_INDEX " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VoxelIdx3  ) ) + "\n"
+        "#define SHAKE_VOXEL_TEX2 "  + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VoxelTex2  ) ) + "\n"
     ;
 }
 

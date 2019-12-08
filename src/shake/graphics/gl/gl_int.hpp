@@ -16,7 +16,7 @@ STRONGLY_TYPED_ALIAS( ProgramId,        std::uint64_t );
 STRONGLY_TYPED_ALIAS( ShaderId,         std::uint64_t );
 
 STRONGLY_TYPED_ALIAS( UniformLocation,  std::int32_t );
-STRONGLY_TYPED_ALIAS( AttributeIndex,   std::int32_t );
+STRONGLY_TYPED_ALIAS( VertexAttributeIndex,   std::int32_t );
 
 STRONGLY_TYPED_ALIAS( TextureId,        std::uint32_t );
 STRONGLY_TYPED_ALIAS( TextureUnitIndex, std::int32_t );

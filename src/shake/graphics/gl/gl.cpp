@@ -85,9 +85,19 @@ DEFINE_MAPPING( GLenum, to_glenum, Type,
     { Type::UnsignedByte,    GL_UNSIGNED_BYTE   }
 )
 
+DEFINE_MAPPING( GLenum, to_glenum, PixelStorageMode,
+    { PixelStorageMode::PackAlignment,      GL_PACK_ALIGNMENT       },
+    { PixelStorageMode::UnpackAlignment,    GL_UNPACK_ALIGNMENT     }
+)
+
 inline GLsizei to_glsizei( const SizeI size )
 {
     return static_cast<GLsizei>( *size );
+}
+
+inline GLint to_glint( const SizeI size )
+{
+     return static_cast<GLint>( *size );
 }
 
 inline GLint to_glint( const std::uint64_t v )
@@ -95,9 +105,24 @@ inline GLint to_glint( const std::uint64_t v )
     return static_cast<GLint>( v );
 }
 
+inline GLint to_gluint( const std::uint32_t v )
+{
+    return static_cast<GLuint>( v );
+}
+
 inline GLint to_glint( const TextureUnitIndex v )
 {
     return static_cast<GLint>( *v );
+}
+
+inline GLuint to_gluint( const VaoId id )
+{
+    return to_gluint( *id );
+}
+
+inline GLuint to_gluint( const VertexAttributeIndex index )
+{
+    return to_gluint( *index );
 }
 
 
@@ -131,6 +156,9 @@ void init( const LoaderFunctionAddress& gl_load_proc )
 
     // Set default colour after clearing the colour buffer
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+    // TODO: Required for freetype? or can be removed?
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Disable byte-alignment restriction
 }
 
 void clear ( std::vector<FramebufferBitFlag> framebuffer_bit_flags )
@@ -484,7 +512,7 @@ void active_texture( const TextureUnitIndex texture_unit_index )
     }
 }
 
-void enable_vertex_array_attrib( const VaoId id, const AttributeIndex index )
+void enable_vertex_array_attrib( const VaoId id, const VertexAttributeIndex index )
 {
     glEnableVertexArrayAttrib( *id, *index );
 }
@@ -551,6 +579,20 @@ void texture_sub_image_2d
     );
 }
 
+void enable_vertex_array_attribute( const VaoId id, const VertexAttributeIndex index )
+{
+    glEnableVertexArrayAttrib( to_gluint( id ), to_gluint( index ) );
+}
+
+void disable_vertex_array_attribute( const VaoId id, const VertexAttributeIndex index )
+{
+    glDisableVertexArrayAttrib( to_gluint( id ), to_gluint( index ) );
+}
+
+void pixel_store( const PixelStorageMode mode, const SizeI size )
+{
+    glPixelStorei( to_glenum( mode ), to_glint( size ) );
+}
 
 } // namespace gl
 } // namespace graphics

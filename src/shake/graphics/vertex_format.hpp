@@ -5,6 +5,7 @@
 
 #include "shake/core/type_traits/underlying_cast.hpp"
 
+#include "shake/graphics/gl/gl_int.hpp"
 #include "shake/graphics/vertex_attribute.hpp"
 
 namespace shake {
@@ -12,7 +13,7 @@ namespace graphics {
 
 struct VertexFormatElement
 {
-    VertexAttribute::Location  location;
+    gl::VertexAttributeIndex  location;
     VertexAttribute::Size      size;
 };
 
@@ -33,43 +34,43 @@ namespace VertexFormats
 {
     const VertexFormat Pos2
     {
-        { VertexAttribute::Location::VertexPos2,    VertexAttribute::Size::_2 }
+        //{ VertexAttribute::Location::VertexPos2,    VertexAttribute::Size::_2 }
     };
 
     const VertexFormat Pos2Tex2
     {
-        { VertexAttribute::Location::VertexPos2,    VertexAttribute::Size::_2 },
-        { VertexAttribute::Location::VertexTex2,    VertexAttribute::Size::_2 }
+        //{ VertexAttribute::Location::VertexPos2,    VertexAttribute::Size::_2 },
+        //{ VertexAttribute::Location::VertexTex2,    VertexAttribute::Size::_2 }
     };
 
     const VertexFormat Pos3
     {
-        { VertexAttribute::Location::VertexPos3,    VertexAttribute::Size::_3 }
+        //{ VertexAttribute::Location::VertexPos3,    VertexAttribute::Size::_3 }
     };
 
     const VertexFormat Pos3Tex2
     {
-        { VertexAttribute::Location::VertexPos3,    VertexAttribute::Size::_3 },
-        { VertexAttribute::Location::VertexTex2,    VertexAttribute::Size::_2 }
+        //{ VertexAttribute::Location::VertexPos3,    VertexAttribute::Size::_3 },
+        //{ VertexAttribute::Location::VertexTex2,    VertexAttribute::Size::_2 }
     };
 
     const VertexFormat Pos3Nor3
     {
-        { VertexAttribute::Location::VertexPos3,    VertexAttribute::Size::_3 },
-        { VertexAttribute::Location::VertexNorm,    VertexAttribute::Size::_3 }
+        //{ VertexAttribute::Location::VertexPos3,    VertexAttribute::Size::_3 },
+        //{ VertexAttribute::Location::VertexNorm,    VertexAttribute::Size::_3 }
     };
 
     const VertexFormat Pos3Tex2Nor3
     {
-        { VertexAttribute::Location::VertexPos3,    VertexAttribute::Size::_3 },
-        { VertexAttribute::Location::VertexTex2,    VertexAttribute::Size::_2 },
-        { VertexAttribute::Location::VertexNorm,    VertexAttribute::Size::_3 }
+        //{ VertexAttribute::Location::VertexPos3,    VertexAttribute::Size::_3 },
+        //{ VertexAttribute::Location::VertexTex2,    VertexAttribute::Size::_2 },
+        //{ VertexAttribute::Location::VertexNorm,    VertexAttribute::Size::_3 }
     };
 
     const VertexFormat VoxelIdx3Tex2
     {
-        { VertexAttribute::Location::VoxelIdx3,     VertexAttribute::Size::_3 },
-        { VertexAttribute::Location::VoxelTex2,     VertexAttribute::Size::_2 }
+        //{ VertexAttribute::Location::VoxelIdx3,     VertexAttribute::Size::_3 },
+        //{ VertexAttribute::Location::VoxelTex2,     VertexAttribute::Size::_2 }
     };
 }
 

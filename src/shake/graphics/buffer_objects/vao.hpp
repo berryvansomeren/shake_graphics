@@ -33,15 +33,15 @@ public:
 
     void specify_vertex_attrib
     (
-        VertexAttribute::Location   location,
+        gl::VertexAttributeIndex   location,
         VertexAttribute::Size       size,
         uint32_t                    stride,
         uint32_t                    offset
     );
 
-    void enable_vertex_attrib       ( VertexAttribute::Location location );
-    void disable_vertex_attrib      ( VertexAttribute::Location location );
-    void set_vertex_attrib_divisor  ( VertexAttribute::Location location, const uint32_t divisor );
+    void enable_vertex_attrib       ( gl::VertexAttributeIndex location );
+    void disable_vertex_attrib      ( gl::VertexAttributeIndex location );
+    void set_vertex_attrib_divisor  ( gl::VertexAttributeIndex location, const uint32_t divisor );
 
 private:
 

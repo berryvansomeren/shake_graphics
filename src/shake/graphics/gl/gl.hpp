@@ -99,7 +99,7 @@ VaoId gen_vertex_array();
 void delete_vertex_array( const VaoId id );
 void bind_vertex_array  ( const VaoId id );
 
-void enable_vertex_array_attrib( const VaoId id, const AttributeIndex index );
+void enable_vertex_array_attrib( const VaoId id, const VertexAttributeIndex index );
 
 //----------------------------------------------------------------
 // Texture
@@ -133,6 +133,12 @@ void texture_sub_image_2d
     const Type          type,
     const void*         data
 );
+
+
+void enable_vertex_array_attribute( const VaoId id, const VertexAttributeIndex index );
+void disable_vertex_array_attribute( const VaoId id, const VertexAttributeIndex index );
+
+void pixel_store( const PixelStorageMode mode, const SizeI size );
 
 } // namespace gl
 } // namespace graphics

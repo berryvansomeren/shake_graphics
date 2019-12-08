@@ -1,11 +1,8 @@
 #ifndef TEXTURE_PARAMETERS_HPP
 #define TEXTURE_PARAMETERS_HPP
 
-#include <glad/glad.h>
-
 #include <string>
 
-#include "shake/core/contracts/contracts.hpp"
 #include "shake/core/data_structures/map.hpp"
 #include "shake/core/macros/macro_define_mapping.hpp"
 

@@ -61,35 +61,35 @@ void Vao::specify_enable_vertex_format_instanced( const VertexFormat& vertex_for
 //----------------------------------------------------------------
 void Vao::specify_vertex_attrib
 (
-    VertexAttribute::Location   location,
+    gl::VertexAttributeIndex   location,
     VertexAttribute::Size       size,
     uint32_t                    stride,
     uint32_t                    offset
 )
 {
     //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to specify a vertex attribute while the vao is not currently bound.");
-    m_vertex_attributes[ underlying_cast( location ) ].specify(location, size, stride, offset);
+    m_vertex_attributes[ *location ].specify(location, size, stride, offset);
 }
 
 //----------------------------------------------------------------
-void Vao::enable_vertex_attrib(VertexAttribute::Location location)
+void Vao::enable_vertex_attrib( gl::VertexAttributeIndex location)
 {
     //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to enable a vertex attribute while the vao is not currently bound.");
-    m_vertex_attributes[ underlying_cast( location ) ].enable( location );
+    m_vertex_attributes[ *location ].enable( location );
 }
 
 //----------------------------------------------------------------
-void Vao::disable_vertex_attrib(VertexAttribute::Location location)
+void Vao::disable_vertex_attrib( gl::VertexAttributeIndex location)
 {
     //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to disable a vertex attribute while the vao is not currently bound.");
-    m_vertex_attributes[ underlying_cast( location ) ].disable( location );
+    m_vertex_attributes[ *location ].disable( location );
 }
 
 //----------------------------------------------------------------
-void Vao::set_vertex_attrib_divisor ( VertexAttribute::Location location, const uint32_t divisor )
+void Vao::set_vertex_attrib_divisor( gl::VertexAttributeIndex location, const uint32_t divisor )
 {
     //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to disable a vertex attribute while the vao is not currently bound.");
-    m_vertex_attributes[ underlying_cast( location ) ].set_divisor( location, divisor );
+    m_vertex_attributes[ *location ].set_divisor( location, divisor );
 }
 
 //----------------------------------------------------------------
