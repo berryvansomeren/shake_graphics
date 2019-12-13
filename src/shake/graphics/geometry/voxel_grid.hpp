@@ -5,7 +5,7 @@
 #include <array>
 
 #include "shake/core/math/math.hpp"
-#include "shake/core/data_structures/array_3d.hpp"
+#include "shake/core/std/array_3d.hpp"
 #include "shake/core/macros/macro_property.hpp"
 #include "shake/graphics/buffer_objects/ebo.hpp"
 #include "shake/graphics/buffer_objects/vao.hpp"

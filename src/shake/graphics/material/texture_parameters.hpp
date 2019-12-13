@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "shake/core/data_structures/map.hpp"
+#include "shake/core/std/map.hpp"
 #include "shake/core/macros/macro_define_mapping.hpp"
 
 namespace shake {

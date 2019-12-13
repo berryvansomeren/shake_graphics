@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "shake/core/data_structures/map.hpp"
+#include "shake/core/std/map.hpp"
 #include "shake/core/macros/macro_property.hpp"
 #include "shake/graphics/material/uniform.hpp"
 #include "shake/graphics/material/shader.hpp"

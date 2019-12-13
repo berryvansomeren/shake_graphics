@@ -1,7 +1,7 @@
 #ifndef FONT_HPP
 #define FONT_HPP
 
-#include "shake/core/data_structures/map.hpp"
+#include "shake/core/std/map.hpp"
 #include "shake/core/math/math.hpp"
 
 #include "shake/graphics/assets/sprite.hpp"

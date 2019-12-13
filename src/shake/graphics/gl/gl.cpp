@@ -4,7 +4,7 @@
 
 #include <glad/glad.h>
 
-#include "shake/core/data_structures/map.hpp"
+#include "shake/core/std/map.hpp"
 #include "shake/core/contracts/check.hpp"
 #include "shake/core/contracts/contracts.hpp"
 #include "shake/core/macros/macro_define_mapping.hpp"
