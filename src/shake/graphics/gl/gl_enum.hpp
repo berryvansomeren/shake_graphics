@@ -28,7 +28,7 @@ enum class Filter                   { Nearest, Linear };
 
 enum class SizedInternalFormat      { RGBA8 };
 
-enum class Type                     { UnsignedByte };
+enum class Type                     { Float, UnsignedByte };
 
 enum class PixelStorageMode         { PackAlignment, UnpackAlignment };
 
@@ -45,19 +45,19 @@ inline TextureUnitIndex to_texture_unit_index( const NamedTextureUnit named_text
 
 enum class NamedVertexAttributeIndex : uint8_t
 {
-    VertexPos2  = 0,
-    VertexTex2  = 1,
+    Position2f  = 0,
+    TextureCoordinates2f  = 1,
 
-    VertexPos3  = 2,
-    VertexNorm  = 3,
+    Position3f  = 2,
+    Normal3f  = 3,
 
     VoxelIdx3   = 4,
     VoxelTex2   = 5
 };
 
-inline VertexAttributeIndex to_vertex_attribute_index( const NamedVertexAttributeIndex named_vertex_attribute_location )
+inline AttributeIndex to_vertex_attribute_index( const NamedVertexAttributeIndex named_vertex_attribute_location )
 {
-    return VertexAttributeIndex { underlying_cast( named_vertex_attribute_location ) }; 
+    return AttributeIndex { underlying_cast( named_vertex_attribute_location ) }; 
 }
 
 

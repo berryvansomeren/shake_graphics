@@ -10,16 +10,18 @@
 namespace shake     {
 namespace graphics  {
 
-struct RenderPack3D
-{
-    const AGeometry3D::Ptr  geometry;
-    const Material::Ptr     material;
-};
-
+//----------------------------------------------------------------
 struct RenderPack2D
 {
-    const AGeometry2D::Ptr  geometry;
-    const Material::Ptr     material;
+    const std::shared_ptr<Geometry2D>   geometry;
+    const std::shared_ptr<Material>     material;
+};
+
+//----------------------------------------------------------------
+struct RenderPack3D
+{
+    const std::shared_ptr<Geometry3D>   geometry;
+    const std::shared_ptr<Material>     material;
 };
 
 } // namespace graphics

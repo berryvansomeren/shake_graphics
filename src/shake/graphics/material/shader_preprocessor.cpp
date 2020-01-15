@@ -3,8 +3,6 @@
 #include "shake/core/contracts/contracts.hpp"
 #include "shake/core/type_traits/underlying_cast.hpp"
 
-#include "shake/graphics/vertex_attribute.hpp"
-
 namespace shake {
 namespace graphics {
 namespace shader_preprocessor {
@@ -22,11 +20,11 @@ std::string get_default_vertex_shader_defines()
     return
         "#define SHAKE_VERTEX_SHADER\n"
 
-        "#define SHAKE_VERTEX_POS2 " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VertexPos2 ) ) + "\n"
-        "#define SHAKE_VERTEX_TEX2 " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VertexTex2 ) ) + "\n"
+        "#define SHAKE_VERTEX_POS2 " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::Position2f ) ) + "\n"
+        "#define SHAKE_VERTEX_TEX2 " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::TextureCoordinates2f ) ) + "\n"
 
-        "#define SHAKE_VERTEX_POS3 " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VertexPos3 ) ) + "\n"
-        "#define SHAKE_VERTEX_NORM " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VertexNorm ) ) + "\n"
+        "#define SHAKE_VERTEX_POS3 " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::Position3f ) ) + "\n"
+        "#define SHAKE_VERTEX_NORM " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::Normal3f ) ) + "\n"
 
         "#define SHAKE_VOXEL_INDEX " + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VoxelIdx3  ) ) + "\n"
         "#define SHAKE_VOXEL_TEX2 "  + std::to_string( underlying_cast( gl::NamedVertexAttributeIndex::VoxelTex2  ) ) + "\n"

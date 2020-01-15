@@ -1,5 +1,7 @@
 #include "draw.hpp"
 
+#include <variant>
+
 #include "shake/graphics/context.hpp"
 
 #include "shake/graphics/gl/gl_enum.hpp"
@@ -21,13 +23,12 @@ void draw
 
     material->bind();
 
-    shader->set_uniform( "u_SHAKE_MODEL",         transform.get_matrix()          );
-    // still have to support 2D camera
-    shader->set_uniform( "u_SHAKE_PROJECTION",    get_current_ortho_projection()  );
+    //shader->set_uniform( "u_SHAKE_MODEL",         transform.get_matrix()          );
+    //shader->set_uniform( "u_SHAKE_PROJECTION",    get_current_ortho_projection()  );
 
     shader->set_uniform( "u_color", glm::vec3( 1.f ) );
 
-    geometry->draw();
+    draw( geometry );
 }
 
 //----------------------------------------------------------------
@@ -50,22 +51,25 @@ void draw
 
     // shader->set_uniform( "u_color", glm::vec3( 1.f ) );
 
-    geometry->draw();
+    draw( geometry );
 }
 
-
-void draw( const Primitive2D& primitive )
+//----------------------------------------------------------------
+void draw( const std::shared_ptr<Geometry2D>& primitive )
 {
-    primitive.get_has_index_buffer()
-        ? gl::draw_elements( primitive.get_type(), primitive.get_count() )
-        : gl::draw_arrays(   primitive.get_type(), primitive.get_count() );
+    gl::bind_vertex_array( primitive->get_vao()->get_id() );
+    //primitive.get_has_index_buffer()
+    //    ? gl::draw_elements( primitive.get_type(), primitive.get_count() )
+    gl::draw_arrays( primitive->get_type(), primitive->get_count() );
 }
 
-void draw( const Primitive3D& primitive )
+//----------------------------------------------------------------
+void draw( const std::shared_ptr<Geometry3D>& primitive )
 {
-    primitive.get_has_index_buffer()
-        ? gl::draw_elements( primitive.get_type(), primitive.get_count() )
-        : gl::draw_arrays(   primitive.get_type(), primitive.get_count() );
+    gl::bind_vertex_array( primitive->get_vao()->get_id() );
+    // primitive.get_has_index_buffer()
+    //    ? gl::draw_elements( primitive.get_type(), primitive.get_count() )
+    gl::draw_arrays(   primitive->get_type(), primitive->get_count() );
 }
 
 } // namespace graphics

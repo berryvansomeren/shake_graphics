@@ -1,7 +1,6 @@
 #ifndef GL_HPP
 #define GL_HPP
 
-#include <cstdint>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -10,16 +9,13 @@
 #include "shake/graphics/gl/gl_int.hpp"
 
 namespace shake {
-
 namespace graphics {
 namespace gl {
 
-
 using LoaderFunctionAddress = void* (*) ( const char* name );
 
-
+//----------------------------------------------------------------
 void init( const LoaderFunctionAddress& gl_load_proc );
-
 
 //----------------------------------------------------------------
 // Context
@@ -87,19 +83,46 @@ void set_uniform( const UniformLocation location, const TextureUnitIndex value  
 //----------------------------------------------------------------
 // Buffer
 
-BufferId gen_buffer();
-void delete_buffer  ( const BufferId id );
-void bind_buffer    ( const BufferTarget target, const BufferId id );
-void buffer_data    ( const BufferId id, const SizeI size, const void* data, const Usage usage );
+BufferId create_buffer();
+void delete_buffer      ( const BufferId id );
+void bind_buffer        ( const BufferTarget target, const BufferId id );
+void named_buffer_data  ( const BufferId id, const Size size, const void* data, const Usage usage );
 
 //----------------------------------------------------------------
-// Vertex Array
+// Vertex Array Object
 
-VaoId gen_vertex_array();
+VaoId create_vertex_array();
 void delete_vertex_array( const VaoId id );
 void bind_vertex_array  ( const VaoId id );
 
-void enable_vertex_array_attrib( const VaoId id, const VertexAttributeIndex index );
+void enable_vertex_array_attrib( const VaoId id, const AttributeIndex index );
+void disable_vertex_array_attrib( const VaoId id, const AttributeIndex index );
+
+void vertex_array_vertex_buffer
+(
+    VaoId id, 
+    BindingIndex binding_index,
+    VboId vbo_id,
+    Offset offset,
+    Size stride
+);
+
+void vertex_array_attrib_format
+( 
+    const VaoId             id, 
+    const AttributeIndex    index,
+    const Size              size,
+    const Type              type,
+    const bool              normalized,
+    const Offset            relative_offset
+);
+
+void vertex_array_attrib_binding
+(
+    const VaoId id,
+    const AttributeIndex attribute_index,
+    const BindingIndex binding_index
+);
 
 //----------------------------------------------------------------
 // Texture
@@ -117,8 +140,8 @@ void texture_storage_2d
     const TextureId             id, 
     const uint8_t               n_levels,
     const SizedInternalFormat   internal_format,
-    const SizeI                 width,
-    const SizeI                 height
+    const Size                 width,
+    const Size                 height
 );
 
 void texture_sub_image_2d
@@ -127,18 +150,14 @@ void texture_sub_image_2d
     const uint8_t       level,
     const std::uint64_t x_offset,
     const std::uint64_t y_offset,
-    const SizeI         width,
-    const SizeI         height,
+    const Size         width,
+    const Size         height,
     const TextureFormat format,
     const Type          type,
     const void*         data
 );
 
-
-void enable_vertex_array_attribute( const VaoId id, const VertexAttributeIndex index );
-void disable_vertex_array_attribute( const VaoId id, const VertexAttributeIndex index );
-
-void pixel_store( const PixelStorageMode mode, const SizeI size );
+void pixel_store( const PixelStorageMode mode, const Size size );
 
 } // namespace gl
 } // namespace graphics

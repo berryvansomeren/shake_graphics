@@ -82,6 +82,7 @@ DEFINE_MAPPING( GLenum, to_glint, Filter,
 )
 
 DEFINE_MAPPING( GLenum, to_glenum, Type,
+    { Type::Float,           GL_FLOAT           },       
     { Type::UnsignedByte,    GL_UNSIGNED_BYTE   }
 )
 
@@ -90,12 +91,12 @@ DEFINE_MAPPING( GLenum, to_glenum, PixelStorageMode,
     { PixelStorageMode::UnpackAlignment,    GL_UNPACK_ALIGNMENT     }
 )
 
-inline GLsizei to_glsizei( const SizeI size )
+inline GLsizei to_glsizei( const Size size )
 {
     return static_cast<GLsizei>( *size );
 }
 
-inline GLint to_glint( const SizeI size )
+inline GLint to_glint( const Size size )
 {
      return static_cast<GLint>( *size );
 }
@@ -120,7 +121,7 @@ inline GLuint to_gluint( const VaoId id )
     return to_gluint( *id );
 }
 
-inline GLuint to_gluint( const VertexAttributeIndex index )
+inline GLuint to_gluint( const AttributeIndex index )
 {
     return to_gluint( *index );
 }
@@ -137,8 +138,16 @@ void init( const LoaderFunctionAddress& gl_load_proc )
     {
         CHECK_FAIL( "Could not initialize OpenGl Context" );
     }
-    glGetString(GL_VERSION); // todo remove
 
+    const auto gl_string_to_std_string = []( const GLubyte* s ) { return std::string { reinterpret_cast< char const * >( s ) }; };
+
+    LOG( std::string { "GL version: "   } + gl_string_to_std_string( glGetString( GL_VERSION ) ) ); // todo remove
+    LOG( std::string { "GL vendor: "    } + gl_string_to_std_string( glGetString( GL_VENDOR ) ) );
+    LOG( std::string { "GL renderer: "  } + gl_string_to_std_string( glGetString( GL_RENDERER ) ) );
+    LOG( std::string { "GLSL version: " } + gl_string_to_std_string( glGetString( GL_SHADING_LANGUAGE_VERSION) ) );
+
+    // enable debug output
+    glEnable( GL_DEBUG_OUTPUT );
     glDebugMessageCallback( (GLDEBUGPROC) gl::debug_message::callback, 0 );
 
     // Enable depth (Z) buffer (accept "closest" fragment)
@@ -371,20 +380,20 @@ bool get_shader_iv_compile_status( const ShaderId id )
 
 namespace { // anonymous
 
-std::size_t get_shader_iv_info_log_length( const ShaderId id )
-{
-    auto log_length = GLint { };
-    glGetShaderiv( *id, GL_INFO_LOG_LENGTH, &log_length );
-    return static_cast< std::size_t >( log_length );
-}
+    std::size_t get_shader_iv_info_log_length( const ShaderId id )
+    {
+        auto log_length = GLint { };
+        glGetShaderiv( *id, GL_INFO_LOG_LENGTH, &log_length );
+        return static_cast<std::size_t>( log_length );
+    }
 
-std::string get_shader_info_log( const ShaderId id, std::size_t log_length )
-{
-    auto buffer = std::vector<GLchar>( log_length );
-    glGetShaderInfoLog( *id, log_length, nullptr, buffer.data() );
-    const auto message = std::string { std::begin( buffer ), std::end( buffer ) };
-    return message;
-}
+    std::string get_shader_info_log( const ShaderId id, std::size_t log_length )
+    {
+        auto buffer = std::vector<GLchar>( log_length );
+        glGetShaderInfoLog( *id, log_length, nullptr, buffer.data() );
+        const auto message = std::string { std::begin( buffer ), std::end( buffer ) };
+        return message;
+    }
 
 } // namespace anonymous
 
@@ -433,10 +442,10 @@ void set_uniform( const UniformLocation location, const TextureUnitIndex value )
 
 
 
-BufferId gen_buffer()
+BufferId create_buffer()
 {
     auto id = GLuint { };
-    glGenBuffers( 1, &id );
+    glCreateBuffers( 1, &id );
     return BufferId { id };
 }
 
@@ -450,17 +459,24 @@ void bind_buffer( const BufferTarget target, const BufferId id )
     glBindBuffer( to_glenum( target ), *id );
 }
 
-void buffer_data( const BufferId id, const SizeI size, const void* data, const Usage usage )
+void named_buffer_data( const BufferId id, const Size size, const void* data, const Usage usage )
 {
     glNamedBufferData( *id, *size, data, to_glenum( usage ) );
 }
 
+//----------------------------------------------------------------
+// Vertex Array Object
 
-VaoId gen_vertex_array()
+VaoId create_vertex_array()
 {
     auto id = GLuint { };
-    glGenVertexArrays( 1, &id );
+    glCreateVertexArrays( 1, &id );
     return VaoId { id };
+}
+
+void bind_vertex_array( const VaoId id )
+{
+    glBindVertexArray( *id );
 }
 
 void delete_vertex_array( const VaoId id )
@@ -468,18 +484,61 @@ void delete_vertex_array( const VaoId id )
     glDeleteVertexArrays( 1, &id );
 }
 
-void bind_vertex_array( const VaoId id )
+void enable_vertex_array_attrib( const VaoId id, const AttributeIndex index )
 {
-    //if ( id != gl::current_vao_id() )
-    //{
-    //    gl::VaoId() = id;
-    //    glBindVertexArray( *id );
-    //}
-    //else
-    {
-        LOG( "Trying to bind a VAO while it is already bound." );
-    }
+    glEnableVertexArrayAttrib( to_gluint( id ), to_gluint( index ) );
 }
+
+void disable_vertex_array_attrib( const VaoId id, const AttributeIndex index )
+{
+    glDisableVertexArrayAttrib( to_gluint( id ), to_gluint( index ) );
+}
+
+void vertex_array_attrib_format
+(
+    const VaoId             id,
+    const AttributeIndex    index,
+    const Size              size,
+    const Type              type,
+    const bool              normalized,
+    const Offset            relative_offset
+)
+{
+    glVertexArrayAttribFormat
+    (
+        *id,
+        *index,
+        *size,
+        to_glenum( type ),
+        normalized,
+        *relative_offset
+    );
+}
+
+void vertex_array_attrib_binding
+(
+    const VaoId id,
+    const AttributeIndex attribute_index,
+    const BindingIndex binding_index
+)
+{
+    glVertexArrayAttribBinding( *id, *attribute_index, *binding_index );
+}
+
+void vertex_array_vertex_buffer
+(
+    const VaoId id,
+    const BindingIndex binding_index,
+    const VboId vbo_id,
+    const Offset offset,
+    const Size stride
+)
+{
+    glVertexArrayVertexBuffer( *id, *binding_index, *vbo_id, *offset, *stride );
+}
+
+//----------------------------------------------------------------
+// Texture
 
 
 TextureId gen_texture()
@@ -512,11 +571,6 @@ void active_texture( const TextureUnitIndex texture_unit_index )
     }
 }
 
-void enable_vertex_array_attrib( const VaoId id, const VertexAttributeIndex index )
-{
-    glEnableVertexArrayAttrib( *id, *index );
-}
-
 void texture_parameter( const TextureId id, const TextureWrap wrap )
 {
     const auto glint_wrap = to_glint( wrap );
@@ -537,8 +591,8 @@ void texture_storage_2d
     const TextureId id,
     const uint8_t n_levels,
     const SizedInternalFormat internal_format,
-    const SizeI width,
-    const SizeI height
+    const Size width,
+    const Size height
 )
 {
     glTextureStorage2D
@@ -558,8 +612,8 @@ void texture_sub_image_2d
     const uint8_t level,
     const std::uint64_t x_offset,
     const std::uint64_t y_offset,
-    const SizeI width,
-    const SizeI height,
+    const Size width,
+    const Size height,
     const TextureFormat format,
     const Type          type,
     const void*         data
@@ -567,7 +621,7 @@ void texture_sub_image_2d
 {
     glTextureSubImage2D
     (
-        *id, 
+        *id,
         level,
         to_glint( x_offset ),
         to_glint( y_offset ),
@@ -579,17 +633,9 @@ void texture_sub_image_2d
     );
 }
 
-void enable_vertex_array_attribute( const VaoId id, const VertexAttributeIndex index )
-{
-    glEnableVertexArrayAttrib( to_gluint( id ), to_gluint( index ) );
-}
 
-void disable_vertex_array_attribute( const VaoId id, const VertexAttributeIndex index )
-{
-    glDisableVertexArrayAttrib( to_gluint( id ), to_gluint( index ) );
-}
 
-void pixel_store( const PixelStorageMode mode, const SizeI size )
+void pixel_store( const PixelStorageMode mode, const Size size )
 {
     glPixelStorei( to_glenum( mode ), to_glint( size ) );
 }

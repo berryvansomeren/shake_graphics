@@ -2,66 +2,55 @@
 #define VAO_HPP
 
 #include <memory>
-#include <cstdint>
-#include <array>
+#include <vector>
 
 #include "shake/core/macros/macro_non_copyable.hpp"
+#include "shake/core/macros/macro_property.hpp"
 
 #include "shake/graphics/gl/gl_int.hpp"
-#include "shake/graphics/vertex_attribute.hpp"
-#include "shake/graphics/vertex_format.hpp"
+#include "shake/graphics/buffer_objects/binding_point_specification.hpp"
+#include "shake/graphics/buffer_objects/vbo.hpp"
 
 namespace shake {
 namespace graphics {
 
+//----------------------------------------------------------------
+/*
+    Vertex Array Objects store all data needed to supply vertex data.
+    While the VBO stores only a single data buffer,
+    multiple can be bound to a VAO, 
+    and a VAO also keeps track of their attributes and corresponding formats. 
+
+    This can take different types and shapes,
+    so we could use some kind of polymorphism to store this data inside the class. 
+    However, since we only push the data to the gpu, and then only need to VBO id,
+    our vbo classes only manages this id. 
+    Passing the data to the gpu is done by the helper functions underneath. 
+*/
+
+//----------------------------------------------------------------
 class Vao
 {
 public:
-    using Ptr = std::shared_ptr<Vao>;
-
-public:
+    // rule of five
     Vao();
+    NON_COPYABLE( Vao )
+    Vao( Vao&& other );
+    Vao& operator=( Vao&& other );
     ~Vao();
 
-    NON_COPYABLE( Vao )
-
-    void bind() const;
-
-    void specify_enable_vertex_format( const VertexFormat& vertex_format );
-
-    void specify_enable_vertex_format_instanced( const VertexFormat& vertex_format );
-
-    void specify_vertex_attrib
-    (
-        gl::VertexAttributeIndex   location,
-        VertexAttribute::Size       size,
-        uint32_t                    stride,
-        uint32_t                    offset
-    );
-
-    void enable_vertex_attrib       ( gl::VertexAttributeIndex location );
-    void disable_vertex_attrib      ( gl::VertexAttributeIndex location );
-    void set_vertex_attrib_divisor  ( gl::VertexAttributeIndex location, const uint32_t divisor );
+    void bind( const std::shared_ptr<Vbo>& vbo );
 
 private:
+    PROPERTY_R( gl::VaoId, id )
 
-    gl::VaoId m_id;
-    std::array<VertexAttribute, 16> m_vertex_attributes;
+    std::vector<std::shared_ptr<Vbo>> m_bound_buffers;
 };
 
-void fill_vao
+//----------------------------------------------------------------
+std::shared_ptr<Vao> make_vao
 (
-          Vao&                      vao,
-    const std::vector<float>&       vertices,
-    const VertexFormat&             vertex_format
-);
-
-void fill_vao
-(
-          Vao&                      vao,
-    const std::vector<float>&       vertices,
-    const std::vector<uint32_t>&    indices,
-    const VertexFormat&             vertex_format
+    const BindingPointSpecification& binding_point_specification
 );
 
 } // namespace graphics

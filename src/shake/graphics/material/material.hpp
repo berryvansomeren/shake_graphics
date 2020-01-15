@@ -15,9 +15,6 @@ namespace graphics {
 class Material
 {
 public:
-    using Ptr = std::shared_ptr<Material>;
-
-public:
 
     Material( const Shader::Ptr& shader )
         : m_shader { shader }

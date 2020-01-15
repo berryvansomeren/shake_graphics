@@ -42,25 +42,12 @@ private:
 
     PROPERTY_RW( PolygonMode, current_polygon_mode )
 
-
     PROPERTY_RW( bool, is_depth_test_enabled    )
     PROPERTY_RW( bool, is_face_culling_enabled  )
     PROPERTY_RW( bool, is_depth_mask_enabled    )
 };
 
 auto context = Context { };
-
-//
-//
-//
-//
-//DECLARE_GLOBAL_PROPERTY( ShaderId,      current_shader_id       );
-//DECLARE_GLOBAL_PROPERTY( BufferId,      current_ebo_id          );
-//DECLARE_GLOBAL_PROPERTY( VaoId,         current_vao_id          );
-//DECLARE_GLOBAL_PROPERTY( BufferId,      current_vbo_id          );
-//DECLARE_GLOBAL_PROPERTY( TextureId,     current_texture_id      );
-//DECLARE_GLOBAL_PROPERTY( PolygonMode,   current_polygon_mode    );
-
 
 } // namespace gl
 } // namespace graphics

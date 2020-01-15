@@ -1,27 +1,69 @@
-#ifndef A_GEOMETRY_2D_HPP
-#define A_GEOMETRY_2D_HPP
+#ifndef GRAPHICS_GEOMETRY_2D_HPP
+#define GRAPHICS_GEOMETRY_2D_HPP
 
-#include <memory>
+#include "shake/core/math/math.hpp"
+#include "shake/core/math/coordinates.hpp"
+#include "shake/core/macros/macro_non_copyable.hpp"
+#include "shake/core/macros/macro_property.hpp"
+
+#include "shake/graphics/gl/gl.hpp"
+#include "shake/graphics/buffer_objects/vao.hpp"
+#include "shake/graphics/buffer_objects/vertex_format.hpp"
 
 namespace shake {
 namespace graphics {
 
 //----------------------------------------------------------------
-class AGeometry2D
+class Geometry2D
 {
 public:
-    using Ptr = std::shared_ptr<AGeometry2D>;
+    Geometry2D
+    (
+        const gl::PrimitiveType     type,
+        const std::size_t           count,
+        const std::shared_ptr<Vao>  vao
+    );
 
-public:
-    virtual void draw() const   = 0;
+    // A primitive is non-copyable,
+    // because it relies on a Vao,
+    // which is non-copyable.
+    NON_COPYABLE( Geometry2D )
 
-protected:
-    virtual ~AGeometry2D() {}
-
-
+private:
+    PROPERTY_R( gl::PrimitiveType,      type    )
+    PROPERTY_R( std::size_t,            count   )
+    PROPERTY_R( std::shared_ptr<Vao>,   vao     )
 };
+
+//----------------------------------------------------------------
+std::shared_ptr<Geometry2D> make_geometry_2D
+(
+    const gl::PrimitiveType primitive_type,
+    const std::vector<float>& vertex_data
+);
+
+//----------------------------------------------------------------
+#define DECLARE_MAKE_GEOMETRY_2D( function_name, primitive_name ) \
+    std::shared_ptr<Geometry2D> make_##function_name##_2D ( const std::vector<float>& vertices );
+
+//----------------------------------------------------------------
+DECLARE_MAKE_GEOMETRY_2D( lines,            Lines            )
+DECLARE_MAKE_GEOMETRY_2D( line_strip,       LineStrip        )
+DECLARE_MAKE_GEOMETRY_2D( line_loop,        LineLoop         )
+
+DECLARE_MAKE_GEOMETRY_2D( triangles,        Triangles        )
+DECLARE_MAKE_GEOMETRY_2D( triangle_strip,   TriangleStrip    )
+DECLARE_MAKE_GEOMETRY_2D( triangle_fan,     TriangleFan      )
+
+#undef DECLARE_MAKE_GEOMETRY_2D
+
+//----------------------------------------------------------------
+std::shared_ptr<Geometry2D> make_rectangle_2D( const float& width, const float& height );
+
+//----------------------------------------------------------------
+std::shared_ptr<Geometry2D> make_circle_filled_2D( const float& radius );
 
 } // namespace graphics
 } // namespace shake
 
-#endif // A_GEOMETRY_2D_HPP
+#endif // GRAPHICS_GEOMETRY_2D_HPP

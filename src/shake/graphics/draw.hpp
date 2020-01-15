@@ -12,8 +12,8 @@
 
 #include "shake/graphics/render_pack.hpp"
 
-#include "shake/graphics/geometry/primitive_2d.hpp"
-#include "shake/graphics/geometry/primitive_3d.hpp"
+#include "shake/graphics/geometry/geometry_2d.hpp"
+#include "shake/graphics/geometry/geometry_3d.hpp"
 
 
 namespace shake     {
@@ -33,8 +33,11 @@ void draw
     const Transform3D&  transform
 );
 
-void draw( const Primitive2D& primitive );
-void draw( const Primitive3D& primitive );
+//----------------------------------------------------------------
+void draw( const std::shared_ptr<Geometry2D>& primitive );
+
+//----------------------------------------------------------------
+void draw( const std::shared_ptr<Geometry3D>& primitive );
 
 } // namespace graphics
 } // namespace shake

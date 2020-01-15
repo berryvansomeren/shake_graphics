@@ -1,7 +1,5 @@
 #include "vao.hpp"
 
-#include <glad/glad.h>
-
 #include "shake/core/contracts/contracts.hpp"
 #include "shake/core/type_traits/underlying_cast.hpp"
 
@@ -12,118 +10,124 @@
 namespace shake {
 namespace graphics {
 
+namespace { // anonymous
+
 //----------------------------------------------------------------
-Vao::Vao()
-: m_id { gl::gen_vertex_array() }
+inline void bind_vertex_format( const gl::VaoId id, const gl::BindingIndex binding_index, const VertexFormat& vertex_format )
+{
+    for ( const auto attribute_format : vertex_format )
+    {
+        // enable
+        gl::enable_vertex_array_attrib( id, attribute_format.attribute_index );
+        
+        // specify
+        gl::vertex_array_attrib_format
+        (
+            id, 
+            attribute_format.attribute_index, 
+            attribute_format.attribute_element_count, 
+            attribute_format.attribute_type, 
+            false, // normalized
+            gl::Offset { *get_vertex_size_in_bytes( vertex_format ) }
+        );
+
+        // bind
+        gl::vertex_array_attrib_binding( id, attribute_format.attribute_index, binding_index );
+    }
+}
+
+//----------------------------------------------------------------
+inline void bind_binding_point_specification
+( 
+    const gl::VaoId id, 
+    const gl::BindingIndex binding_index, 
+    const BindingPointSpecification& binding_point_specification 
+)
+{
+    // To this specific binding point index,
+    // of this specific vao,
+    // we bind the following:
+
+    // 1: the buffer format specification
+    bind_vertex_format
+    ( 
+        id, 
+        binding_index, 
+        binding_point_specification.get_buffer_format() 
+    );
+
+    // 2: the vertex buffer itself
+    gl::vertex_array_vertex_buffer
+    ( 
+        id, 
+        binding_index, 
+        binding_point_specification.get_buffer()->get_id(), 
+        gl::Offset { 0 }, 
+        get_vertex_size_in_bytes( binding_point_specification.get_buffer_format() ) 
+    );
+}
+
+//----------------------------------------------------------------
+const auto invalid_vbo_id = gl::VaoId { std::numeric_limits<gl::VaoId::value_type>::max() };
+
+//----------------------------------------------------------------
+bool is_valid( const gl::VaoId& id )
+{
+    return *id < *invalid_vbo_id;
+}
+
+} // namespace anonymous
+
+//----------------------------------------------------------------
+Vao::Vao() 
+    : m_id { gl::create_vertex_array() }
 { }
 
 //----------------------------------------------------------------
-Vao::~Vao()
+Vao::Vao( Vao&& other )
+    : m_id { other.m_id }
 {
-    gl::delete_vertex_array( m_id );
+    other.m_id = invalid_vbo_id;
 }
 
 //----------------------------------------------------------------
-void Vao::bind() const
+Vao& Vao::operator=( Vao&& other )
 {
-    gl::bind_vertex_array( m_id );
+    m_id = other.get_id();
+    other.m_id = invalid_vbo_id;
+    return *this;
 }
 
 //----------------------------------------------------------------
-void Vao::specify_enable_vertex_format( const VertexFormat& vertex_format )
-{
-    uint32_t stride = 0;
-    for ( const auto& element : vertex_format )
+Vao::~Vao() 
+{ 
+    // Maximum possible value for vao id is used to indicate it shouldn't be deleted,
+    // because another object took ownership (via move).
+    // This approach avoids the use of an extra bool or std::optional,
+    // which would introduce a lot more overhead ( especially memory due to padding ).
+    if ( is_valid( m_id ) )
     {
-        stride += static_cast<uint32_t>( shake::underlying_cast( element.size ) );
-    }
-
-    uint32_t offset = 0;
-    for ( const auto& element : vertex_format )
-    {
-        specify_vertex_attrib ( element.location, element.size, stride, offset );
-        enable_vertex_attrib  ( element.location );
-        offset += static_cast<uint32_t>( shake::underlying_cast( element.size ) );
+        gl::delete_vertex_array( m_id ); 
     }
 }
 
 //----------------------------------------------------------------
-void Vao::specify_enable_vertex_format_instanced( const VertexFormat& vertex_format )
+void Vao::bind( const std::shared_ptr<Vbo>& vbo )
 {
-    specify_enable_vertex_format( vertex_format );
-
-    for ( const auto& element : vertex_format )
-    {
-        set_vertex_attrib_divisor( element.location, 1 );
-    }
+    m_bound_buffers.emplace_back( vbo );
 }
 
 //----------------------------------------------------------------
-void Vao::specify_vertex_attrib
+std::shared_ptr<Vao> make_vao
 (
-    gl::VertexAttributeIndex   location,
-    VertexAttribute::Size       size,
-    uint32_t                    stride,
-    uint32_t                    offset
+    const BindingPointSpecification& binding_point_specification
 )
 {
-    //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to specify a vertex attribute while the vao is not currently bound.");
-    m_vertex_attributes[ *location ].specify(location, size, stride, offset);
-}
-
-//----------------------------------------------------------------
-void Vao::enable_vertex_attrib( gl::VertexAttributeIndex location)
-{
-    //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to enable a vertex attribute while the vao is not currently bound.");
-    m_vertex_attributes[ *location ].enable( location );
-}
-
-//----------------------------------------------------------------
-void Vao::disable_vertex_attrib( gl::VertexAttributeIndex location)
-{
-    //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to disable a vertex attribute while the vao is not currently bound.");
-    m_vertex_attributes[ *location ].disable( location );
-}
-
-//----------------------------------------------------------------
-void Vao::set_vertex_attrib_divisor( gl::VertexAttributeIndex location, const uint32_t divisor )
-{
-    //CHECK_EQ(m_id, gl::get_current_vao_id(), "Trying to disable a vertex attribute while the vao is not currently bound.");
-    m_vertex_attributes[ *location ].set_divisor( location, divisor );
-}
-
-//----------------------------------------------------------------
-void fill_vao
-(
-          Vao&                      vao,
-    const std::vector<float>&       vertices,
-    const VertexFormat&             vertex_format
-)
-{
-    Vbo vbo {};
-    vao.bind();
-    vbo.bind();
-    vbo.set_data( vertices );
-    vao.specify_enable_vertex_format( vertex_format );
-}
-
-//----------------------------------------------------------------
-void fill_vao
-(
-          Vao&                      vao,
-    const std::vector<float>&       vertices,
-    const std::vector<uint32_t>&    indices,
-    const VertexFormat&             vertex_format
-)
-{
-    Vbo vbo {};
-    Ebo ebo {};
-    vao.bind();
-    vbo.bind();
-    vbo.set_data( vertices );
-    ebo.bind();
-    ebo.set_data( indices );
-    vao.specify_enable_vertex_format( vertex_format );
+    const auto vao = std::make_shared<Vao>();
+    const auto binding_point_index = gl::BindingIndex { 0 };
+    bind_binding_point_specification( vao->get_id(), binding_point_index, binding_point_specification );
+    vao->bind( binding_point_specification.get_buffer() );
+    return vao;
 }
 
 } // namespace graphics

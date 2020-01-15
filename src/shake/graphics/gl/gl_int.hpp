@@ -7,19 +7,25 @@ namespace shake {
 namespace graphics {
 namespace gl {
 
-STRONGLY_TYPED_ALIAS( SizeI,            std::uint64_t );
+// Fundamental types
+STRONGLY_TYPED_ALIAS( Size,             std::uint64_t )
+STRONGLY_TYPED_ALIAS( Offset,           std::uint64_t )
 
-STRONGLY_TYPED_ALIAS( BufferId,         std::uint32_t );
-STRONGLY_TYPED_ALIAS( VaoId,            std::uint32_t );
+// Buffers
+STRONGLY_TYPED_ALIAS( BufferId,         std::uint32_t )
+STRONGLY_TYPED_ALIAS( VboId,            std::uint32_t )
+STRONGLY_TYPED_ALIAS( VaoId,            std::uint32_t )
+STRONGLY_TYPED_ALIAS( AttributeIndex,   std::int32_t )
+STRONGLY_TYPED_ALIAS( BindingIndex,     std::int32_t )
 
-STRONGLY_TYPED_ALIAS( ProgramId,        std::uint64_t );
-STRONGLY_TYPED_ALIAS( ShaderId,         std::uint64_t );
+// Shaders
+STRONGLY_TYPED_ALIAS( ProgramId,        std::uint64_t )
+STRONGLY_TYPED_ALIAS( ShaderId,         std::uint64_t )
+STRONGLY_TYPED_ALIAS( UniformLocation,  std::int32_t )
 
-STRONGLY_TYPED_ALIAS( UniformLocation,  std::int32_t );
-STRONGLY_TYPED_ALIAS( VertexAttributeIndex,   std::int32_t );
-
-STRONGLY_TYPED_ALIAS( TextureId,        std::uint32_t );
-STRONGLY_TYPED_ALIAS( TextureUnitIndex, std::int32_t );
+// Textures
+STRONGLY_TYPED_ALIAS( TextureId,        std::uint32_t )
+STRONGLY_TYPED_ALIAS( TextureUnitIndex, std::int32_t )
 
 } // namespace gl
 } // namespace graphics

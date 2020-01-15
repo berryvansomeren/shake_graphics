@@ -5,7 +5,7 @@ from cmake_generator import NewTarget, Target, TargetType
 
 # ----------------------------------------------------------------
 def get_target_definitions() -> List[ Target ] :
-    shake_graphics =  NewTarget(
+    shake_graphics = NewTarget(
         name = 'shake_graphics',
         target_type = TargetType.SharedLibrary,
         src_dir_path = ( Path( __file__ ).resolve().parent / 'src/' ).as_posix(),
