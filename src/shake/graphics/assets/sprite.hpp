@@ -12,14 +12,11 @@ namespace graphics {
 class Sprite
 {
 public:
-    using Ptr = std::shared_ptr<Sprite>;
-
-public:
     Sprite
     (
         const float         width,
         const float         height,
-        const Texture::Ptr& texture
+        const std::shared_ptr<Texture>& texture
     )
         : m_width       { width         }
         , m_height      { height        }
@@ -29,7 +26,7 @@ public:
 
     PROPERTY_R( float,          width       )
     PROPERTY_R( float,          height      )
-    PROPERTY_R( Texture::Ptr,   texture     )
+    PROPERTY_R( std::shared_ptr<Texture>,   texture     )
     //PROPERTY_R( Rectangle2D,    geometry    )
 };
 

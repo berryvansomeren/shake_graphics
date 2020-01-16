@@ -25,13 +25,13 @@ glm::vec2 get_current_screen_size( )
 }
 
 //----------------------------------------------------------------
-void set_current_camera( const Camera::Ptr& camera )
+void set_current_camera( const std::shared_ptr<Camera>& camera )
 {
     g_current_camera = camera;
 }
 
 //----------------------------------------------------------------
-Camera::Ptr& get_current_camera( )
+std::shared_ptr<Camera>& get_current_camera( )
 {
     if ( g_current_camera )
     {

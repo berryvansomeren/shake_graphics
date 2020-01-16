@@ -17,8 +17,6 @@ namespace graphics {
 class CubeMap
 {
 public:
-    using Ptr = std::shared_ptr<CubeMap>;
-
     constexpr static size_t n_cube_faces = 6;
 
     // expected order is for each dimension (x, y, z),

@@ -12,9 +12,6 @@ namespace graphics  {
 class Camera
 {
 public:
-    using Ptr = std::shared_ptr<Camera>;
-
-public:
     Camera
     (
         size_t      screen_width,
@@ -23,8 +20,8 @@ public:
 
     void update(float dt);
 
-    const Transform3D::Ptr   get_transform()         const { return m_transform;     }
-          Transform3D::Ptr   get_transform()               { return m_transform;     }
+    const std::shared_ptr<Transform3D>   get_transform()         const { return m_transform;     }
+          std::shared_ptr<Transform3D>   get_transform()               { return m_transform;     }
 
     inline       glm::mat4      get_projection_matrix() const { return m_projection;    }
 
@@ -44,7 +41,7 @@ private:
     float       m_keyboard_speed;
     float       m_mouse_speed;
 
-    Transform3D::Ptr m_transform;
+    std::shared_ptr<Transform3D> m_transform;
     glm::mat4   m_projection;
 };
 

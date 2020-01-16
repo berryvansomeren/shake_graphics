@@ -16,9 +16,6 @@ namespace graphics {
 class Texture
 {
 public:
-    using Ptr = std::shared_ptr<Texture>;
-
-public:
     Texture
     (
         const uint8_t*              image_ptr,

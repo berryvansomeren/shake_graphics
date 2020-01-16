@@ -16,11 +16,11 @@ class Material
 {
 public:
 
-    Material( const Shader::Ptr& shader )
+    Material( const std::shared_ptr<Shader>& shader )
         : m_shader { shader }
     { }
 
-    Material& set_uniform( const std::string& name, AUniform::Ptr uniform )
+    Material& set_uniform( const std::string& name, std::shared_ptr<AUniform> uniform )
     {
         // This replaces the element if it was already present in the map
         const auto uniform_location = m_shader->get_uniform_location( name );
@@ -48,13 +48,13 @@ private:
     struct UniformSpecification
     {
         gl::UniformLocation location;
-        AUniform::Ptr       value;
+        std::shared_ptr<AUniform>       value;
     };
 
     using UniformMap = std::unordered_map<std::string, UniformSpecification>;
 
 private:
-    PROPERTY_R( Shader::Ptr, shader )
+    PROPERTY_R( std::shared_ptr<Shader>, shader )
 
     UniformMap m_uniforms;
 };

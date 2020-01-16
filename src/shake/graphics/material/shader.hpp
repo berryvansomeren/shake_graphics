@@ -17,9 +17,6 @@ namespace graphics {
 class Shader
 {
 public:
-    using Ptr = std::shared_ptr<Shader>;
-
-public:
     Shader();
     ~Shader();
 

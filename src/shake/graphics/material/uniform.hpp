@@ -17,10 +17,8 @@ namespace graphics {
 //----------------------------------------------------------------
 struct AUniform
 {
-    using Ptr = std::unique_ptr<AUniform>;
-
     virtual ~AUniform();
-    virtual void bind( const Shader::Ptr& shader, const gl::UniformLocation uniform_location ) const = 0;
+    virtual void bind( const std::shared_ptr<Shader>& shader, const gl::UniformLocation uniform_location ) const = 0;
 };
 
 //----------------------------------------------------------------
@@ -30,7 +28,7 @@ struct AUniform
     public: \
         Uniform##name ( uniform_type value ); \
         \
-        virtual void bind( const Shader::Ptr& shader, const gl::UniformLocation uniform_location ) const override \
+        virtual void bind( const std::shared_ptr<Shader>& shader, const gl::UniformLocation uniform_location ) const override \
         { \
             shader->set_uniform( uniform_location, m_value ); \
         } \
@@ -53,21 +51,21 @@ class UniformTexture : public AUniform
 public:
     UniformTexture
     (
-        const Texture::Ptr& texture,
+        const std::shared_ptr<Texture>& texture,
               gl::TextureUnitIndex   texture_unit
     )
         : m_texture         { texture }
         , m_texture_unit    { texture_unit }
     { }
 
-    virtual void bind( const Shader::Ptr& shader, const gl::UniformLocation uniform_location ) const override
+    virtual void bind( const std::shared_ptr<Shader>& shader, const gl::UniformLocation uniform_location ) const override
     {
         m_texture->bind( m_texture_unit );
         shader->set_uniform( uniform_location, m_texture_unit );
     }
 
 private:
-    Texture::Ptr    m_texture;
+    std::shared_ptr<Texture> m_texture;
     gl::TextureUnitIndex     m_texture_unit;
 };
 
@@ -77,21 +75,21 @@ class UniformCubeMap : public AUniform
 public:
     UniformCubeMap
     (
-        const CubeMap::Ptr& cube_map,
+        const std::shared_ptr<CubeMap>& cube_map,
               gl::TextureUnitIndex   texture_unit
     )
         : m_cube_map { cube_map }
         , m_texture_unit { texture_unit }
     { }
 
-    virtual void bind( const Shader::Ptr& shader, const gl::UniformLocation uniform_location ) const override
+    virtual void bind( const std::shared_ptr<Shader>& shader, const gl::UniformLocation uniform_location ) const override
     {
         m_cube_map->bind( m_texture_unit );
         shader->set_uniform( uniform_location, m_texture_unit );
     }
 
 private:
-    CubeMap::Ptr    m_cube_map;
+    std::shared_ptr<CubeMap> m_cube_map;
     gl::TextureUnitIndex     m_texture_unit;
 };
 
