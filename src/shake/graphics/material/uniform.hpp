@@ -18,7 +18,7 @@ namespace graphics {
 struct AUniform
 {
     virtual ~AUniform();
-    virtual void bind( const std::shared_ptr<Shader>& shader, const gl::UniformLocation uniform_location ) const = 0;
+    virtual void bind( const std::shared_ptr<Program>& shader, const gl::UniformLocation uniform_location ) const = 0;
 };
 
 //----------------------------------------------------------------
@@ -28,7 +28,7 @@ struct AUniform
     public: \
         Uniform##name ( uniform_type value ); \
         \
-        virtual void bind( const std::shared_ptr<Shader>& shader, const gl::UniformLocation uniform_location ) const override \
+        virtual void bind( const std::shared_ptr<Program>& shader, const gl::UniformLocation uniform_location ) const override \
         { \
             shader->set_uniform( uniform_location, m_value ); \
         } \
@@ -58,7 +58,7 @@ public:
         , m_texture_unit    { texture_unit }
     { }
 
-    virtual void bind( const std::shared_ptr<Shader>& shader, const gl::UniformLocation uniform_location ) const override
+    virtual void bind( const std::shared_ptr<Program>& shader, const gl::UniformLocation uniform_location ) const override
     {
         m_texture->bind( m_texture_unit );
         shader->set_uniform( uniform_location, m_texture_unit );
@@ -82,7 +82,7 @@ public:
         , m_texture_unit { texture_unit }
     { }
 
-    virtual void bind( const std::shared_ptr<Shader>& shader, const gl::UniformLocation uniform_location ) const override
+    virtual void bind( const std::shared_ptr<Program>& shader, const gl::UniformLocation uniform_location ) const override
     {
         m_cube_map->bind( m_texture_unit );
         shader->set_uniform( uniform_location, m_texture_unit );

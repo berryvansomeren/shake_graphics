@@ -7,6 +7,8 @@ namespace shake {
 namespace graphics {
 namespace gl {
 
+STRONGLY_TYPED_ALIAS( Int,              std::uint32_t )
+
 // Fundamental types
 STRONGLY_TYPED_ALIAS( Size,             std::uint64_t )
 STRONGLY_TYPED_ALIAS( Offset,           std::uint64_t )

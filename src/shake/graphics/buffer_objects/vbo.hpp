@@ -36,7 +36,6 @@ namespace graphics {
 class Vbo
 {
 public:
-    // rule of five
     Vbo();
     NON_COPYABLE( Vbo )
     Vbo( Vbo&& other );

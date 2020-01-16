@@ -1,11 +1,11 @@
-#include "shader_preprocessor.hpp"
+#include "glsl_preprocessor.hpp"
 
 #include "shake/core/contracts/contracts.hpp"
 #include "shake/core/type_traits/underlying_cast.hpp"
 
 namespace shake {
 namespace graphics {
-namespace shader_preprocessor {
+namespace glsl_preprocessor {
 
 namespace  { // anonymous
 
@@ -40,7 +40,7 @@ std::string get_default_fragment_shader_defines()
 class ShaderPreprocessor
 {
 public:
-    std::string Preprocess( const std::string& shader_source, const gl::ShaderType shader_type ) const
+    std::string preprocess( const std::string& shader_source, const gl::ShaderType shader_type ) const
     {
         auto result = std::string{ get_default_shader_defines() };
         switch (shader_type)
@@ -58,9 +58,9 @@ ShaderPreprocessor g_shader_preprocessor {};
 
 } // namespace anonymous
 
-std::string Preprocess( const std::string& shader_source, const gl::ShaderType shader_type )
+std::string preprocess( const std::string& shader_source, const gl::ShaderType shader_type )
 {
-    return g_shader_preprocessor.Preprocess( shader_source, shader_type );
+    return g_shader_preprocessor.preprocess( shader_source, shader_type );
 }
 
 } // namespace shader_preprocessor

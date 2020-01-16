@@ -53,6 +53,8 @@ void link_program( const ProgramId id );
 bool get_program_iv_link_status( const ProgramId id );
 std::string get_program_info_log( const ProgramId program_id );
 
+Int get_program_iv_active_uniform_max_lenght( const ProgramId id );
+
 void validate_program( const ProgramId id );
 bool get_program_iv_validate_status( const ProgramId id );
 

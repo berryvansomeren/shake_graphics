@@ -343,6 +343,12 @@ std::string get_program_info_log( const ProgramId program_id )
     return get_program_info_log( program_id, log_length );
 }
 
+Int get_program_iv_active_uniform_max_lenght( const ProgramId id )
+{
+    auto active_uniform_max_length = GLint { };
+    glGetProgramiv( *id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &active_uniform_max_length );
+    return Int { active_uniform_max_length };
+}
 
 
 ShaderId create_shader( const ShaderType type )

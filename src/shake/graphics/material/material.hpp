@@ -16,7 +16,7 @@ class Material
 {
 public:
 
-    Material( const std::shared_ptr<Shader>& shader )
+    Material( const std::shared_ptr<Program>& shader )
         : m_shader { shader }
     { }
 
@@ -54,7 +54,7 @@ private:
     using UniformMap = std::unordered_map<std::string, UniformSpecification>;
 
 private:
-    PROPERTY_R( std::shared_ptr<Shader>, shader )
+    PROPERTY_R( std::shared_ptr<Program>, shader )
 
     UniformMap m_uniforms;
 };
