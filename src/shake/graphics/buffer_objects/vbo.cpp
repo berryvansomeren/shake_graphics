@@ -78,12 +78,12 @@ Vbo::~Vbo()
 
 //----------------------------------------------------------------
 //----------------------------------------------------------------
-std::shared_ptr<Vbo> make_vbo( const std::vector<float>& vertex_data )
+Vbo make_vbo( const std::vector<float>& vertex_data )
 {
-    const auto vbo = std::make_shared<Vbo>();
+    auto vbo = Vbo { };
     gl::named_buffer_data
     ( 
-        gl::BufferId { *vbo->get_id() }, 
+        gl::BufferId { *vbo.get_id() }, 
         get_vertex_data_size( vertex_data ), 
         vertex_data.data(), 
         gl::Usage::StaticDraw 

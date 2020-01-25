@@ -1,24 +1,22 @@
-#ifndef UNIFORM_HPP
-#define UNIFORM_HPP
+#ifndef UNIFORM_MAP_HPP
+#define UNIFORM_MAP_HPP
 
 #include <memory>
+
+#include "shake/core/ranges/index_range.hpp"
+#include "shake/core/std/map.hpp"
+#include "shake/graphics/gl/gl_int.hpp"
 
 namespace shake {
 namespace graphics {
 
+//----------------------------------------------------------------
 using UniformMap = Map< std::string, gl::UniformLocation>;
 
-UniformMap get_uniform_map( const ProgramId& program_id )
-{
-    
-    const auto active_uniform_max_length = gl::get_program_iv_active_uniform_max_lenght( program_id );
-    auto uniform_map = UniformMap { };
-
-
-
-}
+//----------------------------------------------------------------
+UniformMap get_uniform_map( const gl::ProgramId& program_id );
 
 } // namespace graphics
 } // namespace shake
 
-#endif // UNIFORM_HPP
+#endif // UNIFORM_MAP_HPP

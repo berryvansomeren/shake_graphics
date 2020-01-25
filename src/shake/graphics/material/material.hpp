@@ -1,65 +1,63 @@
-#ifndef A_MATERIAL_HPP
-#define A_MATERIAL_HPP
+#ifndef MATERIAL_HPP
+#define MATERIAL_HPP
 
 #include <memory>
-#include <vector>
 
 #include "shake/core/std/map.hpp"
 #include "shake/core/macros/macro_property.hpp"
 #include "shake/graphics/material/uniform.hpp"
-#include "shake/graphics/material/shader.hpp"
+#include "shake/graphics/material/uniform_map.hpp"
+#include "shake/graphics/material/program.hpp"
 
 namespace shake {
 namespace graphics {
 
+//----------------------------------------------------------------
 class Material
 {
 public:
-
-    Material( const std::shared_ptr<Program>& shader )
-        : m_shader { shader }
+    //----------------------------------------------------------------
+    Material( const std::shared_ptr<Program>& program )
+        : m_program { program }
+        , m_uniforms { get_uniform_map( program->get_id() ) }
     { }
 
-    Material& set_uniform( const std::string& name, std::shared_ptr<AUniform> uniform )
+    //----------------------------------------------------------------
+    inline bool has_uniform( const std::string& uniform_name ) const
     {
-        // This replaces the element if it was already present in the map
-        const auto uniform_location = m_shader->get_uniform_location( name );
-        map::erase_if_has( m_uniforms, name );
-        m_uniforms.emplace( name,  UniformSpecification{ uniform_location, std::move( uniform ) } );
-        return (*this);
+        return map::has( m_uniforms, uniform_name );
     }
 
-    // It feels a bit backward to call the bind function with so many arguments
-    // But the goal is to present a clean interface for creating uniforms,
-    // where you only need to specify the value of the uniform.
-    // The bind() function is supposed to only be called from here.
-    void bind() const
+    //----------------------------------------------------------------
+    template< typename Uniform_T >
+    void set_uniform( const std::string& uniform_name, Uniform_T uniform ) const
     {
-        m_shader->bind();
+        const auto shader_id = m_program->get_id();
+        const auto uniform_location = m_uniforms.at( uniform_name );
+        gl::program_uniform( shader_id, uniform_location, uniform );
+    }
 
-        for ( const auto& uniform_specification : m_uniforms )
-        {
-            const auto& uniform = uniform_specification.second;
-            uniform.value->bind( m_shader, uniform.location );
-        }
+    //----------------------------------------------------------------
+    template< typename Uniform_T >
+    bool try_set_uniform( const std::string& uniform_name, Uniform_T uniform ) const
+    {
+        const auto uniform_present = has_uniform( uniform_name );
+        if ( uniform_present ) { set_uniform( uniform_name, uniform ); }
+        return uniform_present;
+    }
+
+    //----------------------------------------------------------------
+    inline void bind() const
+    {
+        gl::use_program( m_program->get_id() );
     }
 
 private:
-    struct UniformSpecification
-    {
-        gl::UniformLocation location;
-        std::shared_ptr<AUniform>       value;
-    };
-
-    using UniformMap = std::unordered_map<std::string, UniformSpecification>;
-
-private:
-    PROPERTY_R( std::shared_ptr<Program>, shader )
-
-    UniformMap m_uniforms;
+    UniformMap                  m_uniforms;
+    std::shared_ptr<Program>    m_program;
 };
 
 } // namespace graphics
 } // namespace shake
 
-#endif // A_MATERIAL_HPP
+#endif // MATERIAL_HPP

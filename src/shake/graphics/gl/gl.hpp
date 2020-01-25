@@ -46,17 +46,21 @@ void draw_elements_instanced( const PrimitiveType primitive_type, const size_t i
 // Program
 
 ProgramId create_program();
-void use_program( const ProgramId id );
 void delete_program( const ProgramId id );
 void link_program( const ProgramId id );
+void use_program( const ProgramId id );
 
 bool get_program_iv_link_status( const ProgramId id );
-std::string get_program_info_log( const ProgramId program_id );
-
+bool get_program_iv_validate_status( const ProgramId id );
+Int get_program_iv_active_uniforms( const ProgramId id );
 Int get_program_iv_active_uniform_max_lenght( const ProgramId id );
 
+void get_active_uniform( const ProgramId id, const Int uniform_index );
+
+std::string get_program_info_log( const ProgramId program_id );
 void validate_program( const ProgramId id );
-bool get_program_iv_validate_status( const ProgramId id );
+
+
 
 //----------------------------------------------------------------
 // Shader
@@ -73,14 +77,15 @@ std::string get_shader_info_log( const ShaderId shader_id );
 //----------------------------------------------------------------
 // Uniform
 
+std::pair<std::string,UniformLocation> get_active_uniform( const ProgramId id, const Int uniform_index, const Int max_uniform_name_length );
 UniformLocation get_uniform_location( const ProgramId id, const std::string& name );
 
-void set_uniform( const UniformLocation location, const glm::mat4& value    );
-void set_uniform( const UniformLocation location, const glm::vec3& value    );
-void set_uniform( const UniformLocation location, const glm::vec2& value    );
-void set_uniform( const UniformLocation location, const float& value        );
-void set_uniform( const UniformLocation location, const int32_t& value      );
-void set_uniform( const UniformLocation location, const TextureUnitIndex value   );
+void program_uniform( const ProgramId program_id, const UniformLocation location, const glm::mat4& value    );
+void program_uniform( const ProgramId program_id, const UniformLocation location, const glm::vec3& value    );
+void program_uniform( const ProgramId program_id, const UniformLocation location, const glm::vec2& value    );
+void program_uniform( const ProgramId program_id, const UniformLocation location, const float& value        );
+void program_uniform( const ProgramId program_id, const UniformLocation location, const int32_t& value      );
+void program_uniform( const ProgramId program_id, const UniformLocation location, const TextureUnitIndex value   );
 
 //----------------------------------------------------------------
 // Buffer

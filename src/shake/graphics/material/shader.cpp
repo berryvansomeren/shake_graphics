@@ -1,6 +1,7 @@
 #include "shader.hpp"
 
 #include "shake/core/contracts/check.hpp"
+#include "shake/graphics/material/glsl_preprocessor.hpp"
 
 namespace shake {
 namespace graphics {
@@ -48,23 +49,29 @@ Shader::~Shader()
 }
 
 //----------------------------------------------------------------
-void Shader::source( const std::string& source )
+Shader make_shader
+(
+    const gl::ShaderType type,
+    const std::string& source
+)
 {
-    gl::shader_source( m_id, source );
-}
+    auto shader = Shader { type };
+    auto& id = shader.get_id();
 
-//----------------------------------------------------------------
-void Shader::compile()
-{
-    gl::compile_shader( m_id );
+    const auto preprocessed_source = glsl_preprocessor::preprocess( source, type );
+
+    gl::shader_source( id, preprocessed_source );
+    gl::compile_shader( id );
 
     // Check for errors
-    const auto compile_status = gl::get_shader_iv_compile_status( m_id );
+    const auto compile_status = gl::get_shader_iv_compile_status( id );
     if (!compile_status)
     {
-        const auto shader_info_log = gl::get_shader_info_log( m_id );
+        const auto shader_info_log = gl::get_shader_info_log( id );
         CHECK_FAIL( shader_info_log );
     }
+
+    return shader;
 }
 
 } // namespace graphics

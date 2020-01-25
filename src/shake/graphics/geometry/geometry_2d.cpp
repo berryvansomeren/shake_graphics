@@ -22,33 +22,34 @@ Geometry2D::Geometry2D
 { }
 
 //----------------------------------------------------------------
-std::shared_ptr<Geometry2D> make_geometry_2D
+Geometry2D make_geometry_2D
 (
     const gl::PrimitiveType primitive_type,
     const std::vector<float>& vertex_data
 )
 {
     const auto vertex_format = VertexFormats::Pos2;
-    const auto&& vao = make_vao( BindingPointSpecification { vertex_format, make_vbo( vertex_data ) } );
+    const auto vbo_sptr = std::make_shared<Vbo>( make_vbo( vertex_data ) );
+    const auto vao_sptr = std::make_shared<Vao>( make_vao( BindingPointSpecification { vertex_format, vbo_sptr } ) );
     
     const auto vertex_data_size_in_bytes = get_size_in_bytes( vertex_data );
     const auto vertex_size_in_bytes = get_vertex_size_in_bytes( vertex_format );
     EXPECT( math::is_divisible_by( vertex_data_size_in_bytes, *vertex_size_in_bytes ), "Vector of vertex floats has unexpected length." );
     const auto vertex_count = vertex_data_size_in_bytes / *vertex_size_in_bytes;
 
-    const auto result = std::make_shared<Geometry2D>
-    (
+    auto geometry_3d = Geometry2D
+    {
         primitive_type,
         vertex_count, 
-        vao
-    );
+        vao_sptr
+    };
 
-    return result;
+    return geometry_3d;
 }
 
 //----------------------------------------------------------------
 #define DEFINE_MAKE_PRIMIMTIVE_2D( function_name, primitive_name ) \
-    std::shared_ptr<Geometry2D> make_##function_name##_2D ( const std::vector<float>& vertices ) \
+    Geometry2D make_##function_name##_2D ( const std::vector<float>& vertices ) \
     { \
         return make_geometry_2D \
         ( \
@@ -66,8 +67,10 @@ DEFINE_MAKE_PRIMIMTIVE_2D( triangles,       Triangles       )
 DEFINE_MAKE_PRIMIMTIVE_2D( triangle_strip,  TriangleStrip   )
 DEFINE_MAKE_PRIMIMTIVE_2D( triangle_fan,    TriangleFan     )
 
+#undef DEFINE_MAKE_PRIMIMTIVE_2D
+
 //----------------------------------------------------------------
-std::shared_ptr<Geometry2D> make_rectangle_2D( const float& width, const float& height )
+Geometry2D make_rectangle_2D( const float& width, const float& height )
 {
     const auto primitive_type = gl::PrimitiveType::TriangleFan;
     const auto vertices = std::vector<float>
@@ -83,7 +86,7 @@ std::shared_ptr<Geometry2D> make_rectangle_2D( const float& width, const float& 
 }
 
 //----------------------------------------------------------------
-std::shared_ptr<Geometry2D> make_circle_filled_2D( const float& radius )
+Geometry2D make_circle_filled_2D( const float& radius )
 {
     const auto primitive_type = gl::PrimitiveType::TriangleFan;
 

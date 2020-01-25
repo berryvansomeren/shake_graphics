@@ -22,11 +22,6 @@ public:
         const std::shared_ptr<Vao>  vao
     );
 
-    // A primitive is non-copyable,
-    // because it relies on a Vao,
-    // which is non-copyable.
-    NON_COPYABLE( Geometry3D )
-
 private:
     PROPERTY_R( gl::PrimitiveType,      type    )
     PROPERTY_R( std::size_t,            count   )
@@ -34,7 +29,7 @@ private:
 };
 
 //----------------------------------------------------------------
-std::shared_ptr<Geometry3D> make_geometry_3D
+Geometry3D make_geometry_3D
 (
     const gl::PrimitiveType primitive_type,
     const std::vector<float>& vertex_data
@@ -42,7 +37,7 @@ std::shared_ptr<Geometry3D> make_geometry_3D
 
 //----------------------------------------------------------------
 #define DECLARE_MAKE_GEOMETRY_3D( function_name, primitive_name ) \
-    std::shared_ptr<Geometry3D> make_##function_name##_3D ( const std::vector<float>& vertices );
+    Geometry3D make_##function_name##_3D ( const std::vector<float>& vertices );
 
 //----------------------------------------------------------------
 DECLARE_MAKE_GEOMETRY_3D( lines,           Lines           )

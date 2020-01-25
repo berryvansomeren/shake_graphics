@@ -118,15 +118,15 @@ void Vao::bind( const std::shared_ptr<Vbo>& vbo )
 }
 
 //----------------------------------------------------------------
-std::shared_ptr<Vao> make_vao
+Vao make_vao
 (
     const BindingPointSpecification& binding_point_specification
 )
 {
-    const auto vao = std::make_shared<Vao>();
+    auto vao = Vao { };
     const auto binding_point_index = gl::BindingIndex { 0 };
-    bind_binding_point_specification( vao->get_id(), binding_point_index, binding_point_specification );
-    vao->bind( binding_point_specification.get_buffer() );
+    bind_binding_point_specification( vao.get_id(), binding_point_index, binding_point_specification );
+    vao.bind( binding_point_specification.get_buffer() );
     return vao;
 }
 

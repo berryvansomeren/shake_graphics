@@ -13,8 +13,8 @@ namespace graphics  {
 //----------------------------------------------------------------
 struct RenderPack2D
 {
-    const std::shared_ptr<Geometry2D>   geometry;
-    const std::shared_ptr<Material>     material;
+    const std::shared_ptr<Geometry2D>    geometry;
+    const std::shared_ptr<Material>      material;
 };
 
 //----------------------------------------------------------------

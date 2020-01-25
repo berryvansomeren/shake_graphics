@@ -48,7 +48,7 @@ private:
 };
 
 //----------------------------------------------------------------
-std::shared_ptr<Vao> make_vao
+Vao make_vao
 (
     const BindingPointSpecification& binding_point_specification
 );

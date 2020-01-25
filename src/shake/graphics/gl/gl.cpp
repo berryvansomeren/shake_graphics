@@ -276,11 +276,6 @@ ProgramId create_program()
     return ProgramId { glCreateProgram() };
 }
 
-void use_program( const ProgramId id )
-{
-    glUseProgram( *id );
-}
-
 void delete_program( const ProgramId id )
 {
     glDeleteProgram( *id );
@@ -289,6 +284,11 @@ void delete_program( const ProgramId id )
 void link_program( const ProgramId id )
 {
     glLinkProgram( *id );
+}
+
+void use_program( const ProgramId id )
+{
+    glUseProgram( *id );
 }
 
 bool get_program_iv_link_status( const ProgramId id )
@@ -343,11 +343,18 @@ std::string get_program_info_log( const ProgramId program_id )
     return get_program_info_log( program_id, log_length );
 }
 
+Int get_program_iv_active_uniforms( const ProgramId id )
+{
+    auto n_active_uniforms = GLint { };
+    glGetProgramiv( *id, GL_ACTIVE_UNIFORMS, &n_active_uniforms );
+    return Int { static_cast< Int::value_type >( n_active_uniforms ) };
+}
+
 Int get_program_iv_active_uniform_max_lenght( const ProgramId id )
 {
     auto active_uniform_max_length = GLint { };
     glGetProgramiv( *id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &active_uniform_max_length );
-    return Int { active_uniform_max_length };
+    return Int { static_cast< Int::value_type >( active_uniform_max_length ) };
 }
 
 
@@ -409,6 +416,19 @@ std::string get_shader_info_log( const ShaderId shader_id )
     return get_shader_info_log( shader_id, log_length );
 }
 
+std::pair<std::string,UniformLocation> get_active_uniform( const ProgramId id, const Int uniform_index, const Int max_uniform_name_length )
+{
+    auto name_length = GLsizei { };
+    auto uniform_size = GLsizei { };
+    auto uniform_type = GLenum { };
+    auto uniform_name_buffer = std::vector< char > ( *max_uniform_name_length );
+    glGetActiveUniform( *id, *uniform_index, *max_uniform_name_length, &name_length, &uniform_size, &uniform_type, uniform_name_buffer.data() );
+    const auto uniform_name = std::string { std::begin( uniform_name_buffer ), std::begin( uniform_name_buffer ) + name_length };
+    const auto uniform_location = get_uniform_location( id, uniform_name );
+    return { uniform_name, uniform_location };
+}
+
+
 UniformLocation get_uniform_location( const ProgramId id, const std::string& name )
 {
     const auto uniform_location = glGetUniformLocation( *id, name.c_str() );
@@ -416,37 +436,35 @@ UniformLocation get_uniform_location( const ProgramId id, const std::string& nam
     return UniformLocation { uniform_location };
 }
 
-void set_uniform( UniformLocation location, const glm::mat4& value )
+void program_uniform( const ProgramId program_id, UniformLocation location, const glm::mat4& value )
 {
-    glUniformMatrix4fv( *location, 1, GL_FALSE, glm::value_ptr( value ) );
+    glProgramUniformMatrix4fv( *program_id, *location, 1, GL_FALSE, glm::value_ptr( value ) );
 }
 
-void set_uniform( const UniformLocation location, const glm::vec3& value )
+void program_uniform( const ProgramId program_id, const UniformLocation location, const glm::vec3& value )
 {
-    glUniform3f( *location, value.x, value.y, value.z );
+    glProgramUniform3f( *program_id, *location, value.x, value.y, value.z );
 }
 
-void set_uniform( const UniformLocation location, const glm::vec2& value )
+void program_uniform( const ProgramId program_id, const UniformLocation location, const glm::vec2& value )
 {
-    glUniform2f( *location, value.x, value.y );
+    glProgramUniform2f( *program_id, *location, value.x, value.y );
 }
 
-void set_uniform( const UniformLocation location, const float& value )
+void program_uniform( const ProgramId program_id, const UniformLocation location, const float& value )
 {
-    glUniform1f( *location, value );
+    glProgramUniform1f( *program_id, *location, value );
 }
 
-void set_uniform( const UniformLocation location, const int32_t& value )
+void program_uniform( const ProgramId program_id, const UniformLocation location, const int32_t& value )
 {
-    glUniform1i( *location, value );
+    glProgramUniform1i( *program_id, *location, value );
 }
 
-void set_uniform( const UniformLocation location, const TextureUnitIndex value )
+void program_uniform( const ProgramId program_id, const UniformLocation location, const TextureUnitIndex value )
 {
-    glUniform1i( *location, to_glint( value ) );
+    glProgramUniform1i( *program_id, *location, to_glint( value ) );
 }
-
-
 
 BufferId create_buffer()
 {

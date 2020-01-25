@@ -1,6 +1,8 @@
 #ifndef GL_INT_HPP
 #define GL_INT_HPP
 
+#include <cstdint>
+
 #include "shake/core/macros/macro_strongly_typed_alias.hpp"
 
 namespace shake {

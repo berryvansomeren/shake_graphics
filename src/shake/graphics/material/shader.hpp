@@ -22,12 +22,16 @@ public:
     Shader& operator=( Shader&& other );
     ~Shader();
 
-    void source( const std::string& source );
-    void compile();
-
 private:
     PROPERTY_R( gl::ShaderId, id )
 };
+
+//----------------------------------------------------------------
+Shader make_shader
+( 
+    const gl::ShaderType type,  
+    const std::string& source
+);
 
 } // namespace graphics
 } // namespace shake

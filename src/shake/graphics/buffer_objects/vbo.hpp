@@ -47,7 +47,7 @@ private:
 };
 
 //----------------------------------------------------------------
-std::shared_ptr<Vbo> make_vbo( const std::vector<float>& vertex_data );
+Vbo make_vbo( const std::vector<float>& vertex_data );
 
 } // namespace graphics
 } // namespace shake

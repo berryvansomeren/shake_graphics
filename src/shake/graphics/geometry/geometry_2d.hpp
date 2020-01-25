@@ -24,11 +24,6 @@ public:
         const std::shared_ptr<Vao>  vao
     );
 
-    // A primitive is non-copyable,
-    // because it relies on a Vao,
-    // which is non-copyable.
-    NON_COPYABLE( Geometry2D )
-
 private:
     PROPERTY_R( gl::PrimitiveType,      type    )
     PROPERTY_R( std::size_t,            count   )
@@ -36,7 +31,7 @@ private:
 };
 
 //----------------------------------------------------------------
-std::shared_ptr<Geometry2D> make_geometry_2D
+Geometry2D make_geometry_2D
 (
     const gl::PrimitiveType primitive_type,
     const std::vector<float>& vertex_data
@@ -44,7 +39,7 @@ std::shared_ptr<Geometry2D> make_geometry_2D
 
 //----------------------------------------------------------------
 #define DECLARE_MAKE_GEOMETRY_2D( function_name, primitive_name ) \
-    std::shared_ptr<Geometry2D> make_##function_name##_2D ( const std::vector<float>& vertices );
+    Geometry2D make_##function_name##_2D ( const std::vector<float>& vertices );
 
 //----------------------------------------------------------------
 DECLARE_MAKE_GEOMETRY_2D( lines,            Lines            )
@@ -58,10 +53,10 @@ DECLARE_MAKE_GEOMETRY_2D( triangle_fan,     TriangleFan      )
 #undef DECLARE_MAKE_GEOMETRY_2D
 
 //----------------------------------------------------------------
-std::shared_ptr<Geometry2D> make_rectangle_2D( const float& width, const float& height );
+Geometry2D make_rectangle_2D( const float& width, const float& height );
 
 //----------------------------------------------------------------
-std::shared_ptr<Geometry2D> make_circle_filled_2D( const float& radius );
+Geometry2D make_circle_filled_2D( const float& radius );
 
 } // namespace graphics
 } // namespace shake
