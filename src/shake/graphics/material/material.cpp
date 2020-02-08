@@ -3,11 +3,11 @@
 namespace shake {
 namespace graphics {
 
-//----------------------------------------------------------------
-Material::Material( const std::shared_ptr<Program>& program )
-    : m_program { program }
-    , m_uniforms { get_uniform_map( program->get_id() ) }
-{ }
+////----------------------------------------------------------------
+//Material::Material( const std::shared_ptr<Program>& program )
+//    : m_program { program }
+//    , m_uniforms { get_uniform_map( program->get_id() ) }
+//{ }
 
 ////----------------------------------------------------------------
 //bool Material::has_uniform( const std::string& uniform_name ) const
