@@ -1,0 +1,12 @@
+[
+    {
+        "target_name" : "shake_graphics",
+        "target_type" : "shared_library",
+        "source_directory_path" : "src/",
+        "dependencies" :  [
+            "glad",
+            "glm",
+            "shake_core"
+        ]
+    }
+]
